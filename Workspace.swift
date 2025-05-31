@@ -1,10 +1,11 @@
 //
-// Workspace.swift
-// F1ManagerManifests
+//  Workspace.swift
+//  F1ManagerManifests
 //
-// Created by JunHyeok Lee on 5/31/25.
+//  Created by JUNHYEOK LEE on 5/31/25.
 //
 
+import Foundation
 import ProjectDescription
 
 let workspace = Workspace(

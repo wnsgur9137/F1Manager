@@ -1,8 +1,8 @@
 //
 //  Project.swift
-//  ApplicationManifests
+//  ProjectDescriptionHelpers
 //
-//  Created by JunHyeok Lee on 5/31/25.
+//  Created by JUNHYEOK LEE on 5/31/25.
 //
 
 import ProjectDescription

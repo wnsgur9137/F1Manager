@@ -5,6 +5,7 @@
 //  Created by JUNHYEOK LEE on 5/31/25.
 //
 
+import Foundation
 import ProjectDescription
 
 let appVersion: Plist.Value = "0.0.1"

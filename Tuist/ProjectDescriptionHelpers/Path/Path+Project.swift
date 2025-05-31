@@ -27,4 +27,12 @@ public extension ProjectDescription.Path {
     ) -> Self {
         return .relativeToRoot("Projects/\(layer.rawValue)/\(name)")
     }
+    
+    static func relative(
+        to layer: ProjectLayer,
+        domain: ProjectDomain,
+        name: String
+    ) -> Self {
+        return .relativeToRoot("Projects/\(layer.rawValue)/\(domain.rawValue)/\(name)")
+    }
 }
