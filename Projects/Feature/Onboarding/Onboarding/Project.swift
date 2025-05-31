@@ -11,7 +11,7 @@ import ProjectDescriptionHelpers
 
 let project: Project = .project(
     name: "Onboarding",
-    product: .framework,
+    product: .staticFramework,
     dependencies: [
         .Project.Feature.Data.OnboardingData,
         .Project.Feature.Domain.OnboardingDomain,

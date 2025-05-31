@@ -11,7 +11,7 @@ import ProjectDescriptionHelpers
 
 let project: Project = .project(
     name: "Splash",
-    product: .framework,
+    product: .staticFramework,
     dependencies: [
         .Project.Feature.Data.SplashData,
         .Project.Feature.Domain.SplashDomain,
