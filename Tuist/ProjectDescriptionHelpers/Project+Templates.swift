@@ -82,7 +82,7 @@ extension Project {
         hasDemoApp: Bool = false
     ) -> Project {
         let settings: Settings = .settings(
-            base: [
+            base: [:
                 // FlexLayout 사용 시 주석 해제
 //                "OTHER_LDFLAGS": ["-lc++", "-Objc"],
 //                "GCC_PREPROCESSOR_DEFINITIONS": ["FLEXLAYOUT_SWIFT_PACKAGE=1"]

@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import ProjectDescription
 
-extension Path {
+extension ProjectDescription.Path {
     public struct XCConfig {
         public static func app(_ configuration: AppConfiguration) -> Path {
             return "//XCConfig/Application/Application-\(configuration.rawValue).xcconfig"

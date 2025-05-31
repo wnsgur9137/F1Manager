@@ -36,7 +36,7 @@ let targets: [Target] = [
         name: projectName,
         destinations: .iOS,
         product: .app,
-        projectName: projectName,
+        productName: projectName,
         bundleId: organizationName,
         deploymentTargets: deploymentTargets,
         infoPlist: .extendingDefault(with: defaultInfoPlist),
@@ -49,7 +49,7 @@ let targets: [Target] = [
             .Project.InjectionManager.InjectionManager
         ],
         settings: .settings(
-            base: [
+            base: [:
                 // FlexLayout 사용 시 주석 해제
 //                "OTHER_LDFLAGS": ["-lc++", "-Objc"],
 //                "GCC_PREPROCESSOR_DEFINITIONS": ["FLEXLAYOUT_SWIFT_PACKAGE=1"]
@@ -78,13 +78,13 @@ let targets: [Target] = [
         ),
         launchArguments: [
             .launchArgument(
-                "IDEPreferLogStreaming",
+                name: "IDEPreferLogStreaming",
                 isEnabled: true
             )
         ]
     ),
     .target(
-        name: "\(projectName)Tests"
+        name: "\(projectName)Tests",
         destinations: .iOS,
         product: .unitTests,
         productName: "\(projectName)Tests",
@@ -97,7 +97,7 @@ let targets: [Target] = [
             .target(name: projectName)
         ],
         settings: .settings(
-            base: [
+            base: [:
                 // FlexLayout 사용 시 주석 해제
 //                "OTHER_LDFLAGS": ["-lc++", "-Objc"],
 //                "GCC_PREPROCESSOR_DEFINITIONS": ["FLEXLAYOUT_SWIFT_PACKAGE=1"]
