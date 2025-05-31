@@ -42,7 +42,7 @@ let targets: [Target] = [
         infoPlist: .extendingDefault(with: defaultInfoPlist),
         sources: ["Sources/**"],
         resources: ["Resources/**"],
-        entitlements: "../../SupportingFiles/F1Manager.entitlements",
+//        entitlements: "../../SupportingFiles/F1Manager.entitlements",
         scripts: scripts,
         dependencies: [
             .Project.Feature.Features,
@@ -92,7 +92,7 @@ let targets: [Target] = [
         deploymentTargets: deploymentTargets,
         infoPlist: .default,
         sources: ["Tests/**"],
-        entitlements: "../../SupportingFiles/F1Manager.entitlements",
+//        entitlements: "../../SupportingFiles/F1Manager.entitlements",
         dependencies: [
             .target(name: projectName)
         ],
