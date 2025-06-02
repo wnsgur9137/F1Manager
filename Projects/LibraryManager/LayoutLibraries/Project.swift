@@ -2,7 +2,7 @@
 //  Project.swift
 //  ProjectDescriptionHelpers
 //
-//  Created by JUNHYEOK LEE on 6/1/25.
+//  Created by JUNHYEOK LEE on 6/2/25.
 //
 
 import Foundation
@@ -10,10 +10,9 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project: Project = .project(
-    name: "InjectionManager",
-    product: .staticFramework,
+    name: "NetworkInfra",
+    product: .framework,
     dependencies: [
-        .Project.Infrastructure.Network,
-        .Project.Feature.Features
+        .SPM.Layout.SnapKit
     ]
 )

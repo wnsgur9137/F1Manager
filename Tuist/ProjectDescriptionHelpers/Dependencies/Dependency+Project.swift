@@ -41,12 +41,17 @@ extension TargetDependency {
 
 // MARK: - InjectionManager
 public extension TargetDependency.Project.InjectionManager {
-    static let InjectionManager: TargetDependency = .project(name: "InjectionManager")
+    static let InjectionManager: TargetDependency = .project(
+        name: "InjectionManager"
+    )
 }
 
 // MARK: - Infrastructure
 public extension TargetDependency.Project.Infrastructure {
-    
+    static let Network: TargetDependency = .project(
+        layer: .Infrastructure,
+        name: "NetworkInfra"
+    )
 }
 
 // MARK: - Feature
@@ -131,7 +136,22 @@ public extension TargetDependency.Project.Feature.Presentation {
 
 // MARK: - LibraryManager
 public extension TargetDependency.Project.LibraryManager {
-    
+    static let NetworkLibraries: TargetDependency = .project(
+        layer: .LibraryManager,
+        name: "NetworkLibraries"
+    )
+    static let ReactiveLibraries: TargetDependency = .project(
+        layer: .LibraryManager,
+        name: "ReactiveLibraries"
+    )
+    static let LayoutLibraries: TargetDependency = .project(
+        layer: .LibraryManager,
+        name: "LayoutLibraries"
+    )
+    static let UILibraries: TargetDependency = .project(
+        layer: .LibraryManager,
+        name: "UILibraries"
+    )
 }
 
 // MARK: - TragetDependency
