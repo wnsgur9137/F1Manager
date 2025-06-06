@@ -34,8 +34,7 @@ public extension TargetDependency.SPM.Network {
 
 // MARK: - Layout
 public extension TargetDependency.SPM.Layout {
-    static let FlexLayout: TargetDependency = .external(name: "FlexLayout")
-    static let PinLayout: TargetDependency = .external(name: "PinLayout")
+    static let snapKit: TargetDependency = .external(name: "SnapKit")
 }
 
 // MARK: - Reactive
