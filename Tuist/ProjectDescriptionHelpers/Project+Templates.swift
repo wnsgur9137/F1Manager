@@ -79,6 +79,7 @@ extension Project {
         deploymentTarget: DeploymentTargets? = .iOS("16.0"),
         dependencies: [TargetDependency] = [],
         infoPlist: [String: Plist.Value] = [:],
+        hasTest: Bool = false,
         hasResource: Bool = false,
         hasDemoApp: Bool = false
     ) -> Project {
@@ -165,16 +166,13 @@ extension Project {
             .makeScheme(target: .DEV, name: name)
         ]
         
-        let targets: [Target] = hasDemoApp
-        ? [
-            target,
-            testTarget,
-            demoAppTarget
-        ]
-        : [
-            target,
-            testTarget
-        ]
+        var targets: [Target] = [target]
+        if hasTest {
+            targets.append(testTarget)
+        }
+        if hasDemoApp {
+            targets.append(demoAppTarget)
+        }
         
         return Project(
             name: name,

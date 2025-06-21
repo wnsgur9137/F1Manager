@@ -10,7 +10,7 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project: Project = .project(
-    name: "NetworkInfra",
+    name: "LayoutLibraries",
     product: .framework,
     dependencies: [
         .SPM.Layout.SnapKit
