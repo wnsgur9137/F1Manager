@@ -12,6 +12,7 @@ public enum ProjectLayer: String {
     case Application
     case InjectionManager
     case Infrastructure
+    case Base
     case Feature
     case Data
     case Domain
@@ -35,6 +36,7 @@ extension TargetDependency {
             public struct Domain { }
             public struct Presentation { }
         }
+        public struct Base { }
         public struct LibraryManager { }
     }
 }
@@ -51,6 +53,22 @@ public extension TargetDependency.Project.Infrastructure {
     static let Network: TargetDependency = .project(
         layer: .Infrastructure,
         name: "NetworkInfra"
+    )
+}
+
+// MARK: - Base
+public extension TargetDependency.Project.Base {
+    static let Data: TargetDependency = .project(
+        layer: .Base,
+        name: "BaseData"
+    )
+    static let Domain: TargetDependency = .project(
+        layer: .Base,
+        name: "BaseDomain"
+    )
+    static let Presentation: TargetDependency = .project(
+        layer: .Base,
+        name: "BasePresentation"
     )
 }
 

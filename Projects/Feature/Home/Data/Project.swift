@@ -13,6 +13,7 @@ let project: Project = .project(
     name: "HomeData",
     product: .staticFramework,
     dependencies: [
+        .Project.Base.Data,
         .Project.Feature.Domain.HomeDomain
     ]
 )

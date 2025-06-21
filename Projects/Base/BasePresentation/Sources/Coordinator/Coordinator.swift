@@ -9,6 +9,7 @@
 import UIKit
 
 public enum CoordinatorType {
+    case tab
     case splash
     case onboarding
     case home
@@ -20,7 +21,7 @@ public protocol Coordinator: AnyObject {
     var childCoordinator: [Coordinator] { get set }
     var type: CoordinatorType { get }
     
-    func starat()
+    func start()
     func finish()
 }
 
