@@ -14,35 +14,36 @@ struct ApplicationNetworkType: NetworkType {
     typealias T = ApplicationTargetType
     let provider: NetworkProvider<T>
     
-    static func defaultNetworking(
-        baseURL: String
-    ) -> ApplicationNetworkType {
-        let provider = NetworkProvider(
-            endpointClosure: ApplicationNetworkType.endpointClosure(baseURL: baseURL),
-            requestClosure: ApplicationNetworkType.endpointResolver(),
-            stubClosure: ApplicationNetworkType.APIKeysBasedStubBehaviour,
-            plugins: plugins
+    static func defaultNetworking(baseURL: String) -> ApplicationNetworkType {
+        return ApplicationNetworkType(
+            provider: NetworkProvider(
+                endpointClosure: ApplicationNetworkType.endpointsClosure(baseURL: baseURL),
+                requestClosure: ApplicationNetworkType.endpointResolver(),
+                stubClosure: ApplicationNetworkType.APIKeysBasedStubBehaviour,
+                plugins: plugins
+            )
         )
-        return ApplicationNetworkType(provider: provider)
     }
     
     static func stubbingNetworking(
         baseURL: String,
-        needFaile: Bool
+        needFail: Bool
     ) -> ApplicationNetworkType {
         if needFail {
-            let provider = NetworkProvider(
-                endpointClosure: failEndPointsClosure(baseURL: baseURL),
+            return ApplicationNetworkType(
+                provider: NetworkProvider(
+                    endpointClosure: failEndPointsClosure(baseURL: baseURL),
+                    requestClosure: ApplicationNetworkType.endpointResolver(),
+                    stubClosure: MoyaProvider.immediatelyStub
+                )
+            )
+        }
+        return ApplicationNetworkType(
+            provider: NetworkProvider(
+                endpointClosure: endpointsClosure(baseURL: baseURL),
                 requestClosure: ApplicationNetworkType.endpointResolver(),
                 stubClosure: MoyaProvider.immediatelyStub
             )
-            return ApplicationNetworkType(provider: provider)
-        }
-        let provider = NetworkProvider(
-            endpointClosure: endpointsClosure(baseURL: baseURL),
-            requestClosure: ApplicationNetworkType.endpointResolver(),
-            stubClosure: MoyaProvider.immediatelyStub
         )
-        return ApplicationNetworkType(provider: provider)
     }
 }

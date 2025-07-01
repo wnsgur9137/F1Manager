@@ -49,7 +49,7 @@ enum NetworkError: Error {
         case let .requestTimeOut(error):
             fallthrough
         case let .rest(error, _, _, _):
-            return UserTargetType.isNotConnection(error: error) || UserTargetType.isLostConnection(error: error)
+            return ApplicationTargetType.isNotConnection(error: error) || ApplicationTargetType.isLostConnection(error: error)
         case .internetConnection:
             return true
         case .empty:

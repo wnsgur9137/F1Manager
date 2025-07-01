@@ -18,6 +18,13 @@ public final class NetworkManager {
         withFail: Bool,
         baseURL: String
     ) {
-        
+        if withTest {
+            self.applicationProvider = .stubbingNetworking(
+                baseURL: baseURL,
+                needFail: withFail
+            )
+        } else {
+            self.applicationProvider = .defaultNetworking(baseURL: baseURL)
+        }
     }
 }
