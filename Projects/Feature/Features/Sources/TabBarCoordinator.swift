@@ -39,10 +39,7 @@ public final class DefaultTabBarCoordinator: TabBarCoordinator {
         ]
         let controllers: [UINavigationController] = pages.map { getNavigationController($0) }
         prepareTabBarController(with: controllers)
-        guard let tabBarController = self.tabBarController else {
-            print("⌚️tabBarController is null")
-            return
-        }
+        guard let tabBarController = self.tabBarController else { return }
         rootNavigtaionController?.viewControllers = [tabBarController]
     }
     
