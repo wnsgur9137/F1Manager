@@ -14,20 +14,28 @@ import Home
 
 public final class MainSceneDIContainer {
     
+    private let rootNavigtaionController: UINavigationController
+    private let tabBarController: UITabBarController
+    
     struct Dependencies {
         
     }
     
     private let dependencies: Dependencies
     
-    init(dependencies: Dependencies) {
+    init(
+        rootNavigationController: UINavigationController,
+        tabBarController: UITabBarController,
+        dependencies: Dependencies
+    ) {
+        self.rootNavigtaionController = rootNavigationController
+        self.tabBarController = tabBarController
         self.dependencies = dependencies
     }
     
-    public func makeTabBarCoordinator(
-        tabBarController: UITabBarController
-    ) -> TabBarCoordinator {
+    public func makeTabBarCoordinator() -> TabBarCoordinator {
         return DefaultTabBarCoordinator(
+            rootNavigtaionController: rootNavigtaionController,
             tabBarController: tabBarController
         )
     }

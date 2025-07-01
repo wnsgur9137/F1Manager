@@ -6,18 +6,25 @@
 //  Copyright © 2025 com.junhyeok.F1Manager. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 import NetworkInfra
+import Features
 
 public final class AppDIContainer {
     
     public lazy var appConfiguration = AppConfiguration()
     
+    private lazy var mainTabBarController = MainTabBarController()
+    
     public init() { }
     
-    public func makeMainSceneDIContainer() -> MainSceneDIContainer {
+    public func makeMainSceneDIContainer(rootNavigationController: UINavigationController) -> MainSceneDIContainer {
         let dependencies = MainSceneDIContainer.Dependencies()
-        return MainSceneDIContainer(dependencies: dependencies)
+        return MainSceneDIContainer(
+            rootNavigationController: rootNavigationController,
+            tabBarController: mainTabBarController,
+            dependencies: dependencies
+        )
     }
 }

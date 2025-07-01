@@ -21,12 +21,15 @@ public final class DefaultTabBarCoordinator: TabBarCoordinator {
     public var childCoordinator: [Coordinator] = []
     public var type: CoordinatorType { .tab }
     
+    public let rootNavigtaionController: UINavigationController?
     public weak var navigtaionController: UINavigationController?
     public weak var tabBarController: UITabBarController?
     
     public init(
+        rootNavigtaionController: UINavigationController,
         tabBarController: UITabBarController
     ) {
+        self.rootNavigtaionController = rootNavigtaionController
         self.tabBarController = tabBarController
     }
     
@@ -36,6 +39,11 @@ public final class DefaultTabBarCoordinator: TabBarCoordinator {
         ]
         let controllers: [UINavigationController] = pages.map { getNavigationController($0) }
         prepareTabBarController(with: controllers)
+        guard let tabBarController = self.tabBarController else {
+            print("⌚️tabBarController is null")
+            return
+        }
+        rootNavigtaionController?.viewControllers = [tabBarController]
     }
     
     private func getNavigationController(

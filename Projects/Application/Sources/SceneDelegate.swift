@@ -8,9 +8,13 @@
 
 import UIKit
 
+import InjectionManager
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
+    private let appDIContainer = AppDIContainer()
+    private var appFlowCoordinator: AppFlowCoordinator?
     
     func scene(
         _ scene: UIScene,
@@ -20,8 +24,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        let tabBarController = UITabBarController()
-        window?.rootViewController = tabBarController
+        let rootNavigationController = UINavigationController()
+        window?.rootViewController = rootNavigationController
+        appFlowCoordinator = AppFlowCoordinator(
+            rootNavigationController: rootNavigationController,
+            appDIContainer: appDIContainer
+        )
+//        appFlowCoordinator?.startSplash()
+        appFlowCoordinator?.start()
         window?.makeKeyAndVisible()
         return
     }
