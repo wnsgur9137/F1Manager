@@ -10,12 +10,19 @@ import UIKit
 import ReactorKit
 import RxSwift
 import RxCocoa
+import RxGesture
+
+import BasePresentation
 
 public final class HomeViewController: UIViewController {
     
     // MARK: - UI Instances
     
+    private let navigationBar = NavigationBar()
+    
     // MARK: - Properties
+    
+    private var disposeBag = DisposeBag()
     
     // MARK: - Life cycle
     
@@ -34,11 +41,22 @@ public final class HomeViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        print("🚨\(#function)")
+        navigationBar.backgroundColor = .brown
+        addSubviews()
+        setupLayoutConstraints()
     }
 }
 
 // MARK: - Layout
 extension HomeViewController {
+    private func addSubviews() {
+        view.addSubview(navigationBar)
+    }
     
+    private func setupLayoutConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+        }
+    }
 }
