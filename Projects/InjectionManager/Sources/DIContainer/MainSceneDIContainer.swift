@@ -33,10 +33,15 @@ public final class MainSceneDIContainer {
         self.dependencies = dependencies
     }
     
+    private func makeHomeDIContainer() -> HomeDIContainer {
+        return HomeDIContainer()
+    }
+    
     public func makeTabBarCoordinator() -> TabBarCoordinator {
         return DefaultTabBarCoordinator(
             rootNavigtaionController: rootNavigtaionController,
-            tabBarController: tabBarController
+            tabBarController: tabBarController,
+            homeDIContainer: makeHomeDIContainer()
         )
     }
 }

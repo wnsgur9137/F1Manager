@@ -18,19 +18,22 @@ public protocol TabBarCoordinator: Coordinator {
 public final class DefaultTabBarCoordinator: TabBarCoordinator {
     
     public weak var finishDelegate: CoordinatorFinishDelegate?
-    public var childCoordinator: [Coordinator] = []
+    public var childCoordinators: [Coordinator] = []
     public var type: CoordinatorType { .tab }
     
     public let rootNavigtaionController: UINavigationController?
-    public weak var navigtaionController: UINavigationController?
+    public weak var navigationController: UINavigationController?
     public weak var tabBarController: UITabBarController?
+    private let homeDIContainer: HomeDIContainer
     
     public init(
         rootNavigtaionController: UINavigationController,
-        tabBarController: UITabBarController
+        tabBarController: UITabBarController,
+        homeDIContainer: HomeDIContainer
     ) {
         self.rootNavigtaionController = rootNavigtaionController
         self.tabBarController = tabBarController
+        self.homeDIContainer = homeDIContainer
     }
     
     public func start() {
@@ -56,7 +59,13 @@ public final class DefaultTabBarCoordinator: TabBarCoordinator {
         
         switch page {
         case .home:
-            break
+            let homeCoordinator = DefaultHomeCoordinator(
+                navigationController: navigationController,
+                dependencies: homeDIContainer
+            )
+            homeCoordinator.finishDelegate = self
+            homeCoordinator.start()
+            childCoordinators.append(homeCoordinator)
         }
         
         return navigationController
@@ -67,5 +76,12 @@ public final class DefaultTabBarCoordinator: TabBarCoordinator {
     ) {
         tabBarController?.setViewControllers(controllers, animated: true)
         tabBarController?.selectedIndex = TabBarPage.home.orderNumber()
+    }
+}
+
+extension DefaultTabBarCoordinator: CoordinatorFinishDelegate {
+    public func coordinatorDidFinish(childCoordinator: Coordinator) {
+        childCoordinators = childCoordinators.filter{ $0.type != childCoordinator.type }
+        navigationController?.viewControllers.removeAll()
     }
 }
