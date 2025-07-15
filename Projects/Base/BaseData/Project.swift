@@ -14,6 +14,7 @@ let project: Project = .project(
     product: .staticFramework,
     dependencies: [
         .Project.LibraryManager.ReactiveLibraries,
-        .Project.Infrastructure.Network
+        .Project.Infrastructure.Network,
+        .Project.Base.Domain
     ]
 )

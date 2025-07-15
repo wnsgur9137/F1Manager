@@ -17,10 +17,20 @@ public final class AppDIContainer {
     
     private lazy var mainTabBarController = MainTabBarController()
     
+    private lazy var networkManager: NetworkManager = {
+        return NetworkManager(
+            withTest: false,
+            withFail: false,
+            baseURL: "https://api.openf1.org"
+        )
+    }()
+    
     public init() { }
     
     public func makeMainSceneDIContainer(rootNavigationController: UINavigationController) -> MainSceneDIContainer {
-        let dependencies = MainSceneDIContainer.Dependencies()
+        let dependencies = MainSceneDIContainer.Dependencies(
+            networkManager: networkManager
+        )
         return MainSceneDIContainer(
             rootNavigationController: rootNavigationController,
             tabBarController: mainTabBarController,

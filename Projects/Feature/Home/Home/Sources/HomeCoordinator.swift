@@ -12,7 +12,7 @@ import HomePresentation
 import BasePresentation
 
 public protocol HomeCoordinatorDependencies {
-    func makeHomeViewController() -> HomeViewController
+    func makeHomeViewController(flowAction: HomeFlowAction) -> HomeViewController
 }
 
 public protocol HomeCoordinator: Coordinator {
@@ -41,7 +41,8 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
     }
     
     public func showHomeViewController() {
-        let viewController = dependencies.makeHomeViewController()
+        let flowAction = HomeFlowAction()
+        let viewController = dependencies.makeHomeViewController(flowAction: flowAction)
         self.navigationController?.viewControllers = [viewController]
     }
     

@@ -14,7 +14,7 @@ import RxGesture
 
 import BasePresentation
 
-public final class HomeViewController: UIViewController {
+public final class HomeViewController: UIViewController, View {
     
     // MARK: - UI Instances
     
@@ -22,12 +22,14 @@ public final class HomeViewController: UIViewController {
     
     // MARK: - Properties
     
-    private var disposeBag = DisposeBag()
+    public var disposeBag = DisposeBag()
     
     // MARK: - Life cycle
     
-    public static func create() -> HomeViewController {
-        return HomeViewController()
+    public static func create(with reactor: HomeReactor) -> HomeViewController {
+        let viewController = HomeViewController()
+        viewController.reactor = reactor
+        return viewController
     }
     
     private init() {
@@ -44,6 +46,37 @@ public final class HomeViewController: UIViewController {
         navigationBar.backgroundColor = .brown
         addSubviews()
         setupLayoutConstraints()
+    }
+    
+    public func bind(reactor: HomeReactor) {
+        bindAction(reactor)
+        bindState(reactor)
+    }
+}
+
+// MARK: - Bind
+extension HomeViewController {
+    private func bindAction(_ reactor: HomeReactor) {
+        rx.viewDidLoad
+            .map { Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindState(_ reactor: HomeReactor) {
+        reactor.pulse(\.$driver)
+            .compactMap { $0 }
+            .bind(onNext: { driver in
+                print(driver)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .compactMap { $0 }
+            .bind(onNext: { error in
+                
+            })
+            .disposed(by: disposeBag)
     }
 }
 

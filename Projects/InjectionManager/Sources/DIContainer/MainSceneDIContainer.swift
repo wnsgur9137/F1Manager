@@ -18,7 +18,7 @@ public final class MainSceneDIContainer {
     private let tabBarController: UITabBarController
     
     struct Dependencies {
-        
+        let networkManager: NetworkManager
     }
     
     private let dependencies: Dependencies
@@ -34,7 +34,10 @@ public final class MainSceneDIContainer {
     }
     
     private func makeHomeDIContainer() -> HomeDIContainer {
-        return HomeDIContainer()
+        let dependencies = HomeDIContainer.Dependencies(
+            networkManager: dependencies.networkManager
+        )
+        return HomeDIContainer(dependencies: dependencies)
     }
     
     public func makeTabBarCoordinator() -> TabBarCoordinator {
