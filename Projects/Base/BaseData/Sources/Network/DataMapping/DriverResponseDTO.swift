@@ -61,17 +61,16 @@ private struct DriverTableContainer: Decodable {
 struct DriversResponseDTO: Decodable {
     let drivers: [DriverResponseDTO]
     
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let mrData = try container.nestedContainer(keyedBy: CodingKeys.MRDataKeys.self, forKey: .MRData)
-        let driverTable = try mrData.decode(DriverTableContainer.self, forKey: .DriverTable)
-        self.drivers = driverTable.DriverTable.Drivers
-    }
-    
     enum CodingKeys: String, CodingKey {
         case MRData
-        enum MRDataKeys: String, CodingKey {
-            case DriverTable
-        }
+        case DriverTable
+        case Drivers
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let mrData = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .MRData)
+        let driverTable = try mrData.nestedContainer(keyedBy: CodingKeys.self, forKey: .DriverTable)
+        self.drivers = try driverTable.decode([DriverResponseDTO].self, forKey: .Drivers)
     }
 }

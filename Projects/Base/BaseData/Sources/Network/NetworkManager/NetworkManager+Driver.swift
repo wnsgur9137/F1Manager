@@ -19,7 +19,6 @@ extension NetworkManager {
             type: DriversResponseDTO.self
         )
         .map {
-            print("😢$0.drivers: \($0.drivers)")
             return $0.drivers
         }
     }
@@ -30,7 +29,6 @@ extension NetworkManager {
             type: [DriverDetailResponseDTO].self
         )
         .flatMap { drivers in
-            print("🛰️ drivers: \(drivers)")
             guard let driver = drivers.first else {
                 return .error(DriverNetworkError.driverNotFound)
             }

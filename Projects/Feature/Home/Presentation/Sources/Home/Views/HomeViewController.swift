@@ -115,8 +115,8 @@ extension HomeViewController {
     private func bindState(_ reactor: HomeReactor) {
         reactor.pulse(\.$drivers)
             .compactMap { $0 }
+            .map { return Array($0.prefix(4)) }
             .bind(onNext: { [weak self] drivers in
-                print(drivers)
                 self?.drivers = drivers
                 self?.driversCollectionView.reloadData()
             })

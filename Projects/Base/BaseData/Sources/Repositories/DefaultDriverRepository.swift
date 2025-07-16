@@ -41,33 +41,24 @@ public final class DefaultDriverRepository: DriverRepository {
 
 extension DefaultDriverRepository {
     public func getDrivers(year: Int) -> Single<[Driver]> {
-        print("🚨getDrivers: \(year)")
         return networkManager
             .getDrivers(year: year)
             .flatMap { driverDTOs in
-                print("🚨DTOs count: \(driverDTOs.count)")
-                
-                // 빈 배열 처리
                 guard !driverDTOs.isEmpty else {
-                    print("🚨Empty driver list")
                     return Single.just([])
                 }
                 
                 let driverSingles: [Single<Driver>] = driverDTOs.map { driverDTO in
                     guard let driverNumberString = driverDTO.driverNumber,
                           let driverNumber = Int(driverNumberString) else {
-                        print("🚨driverNumber: nil for driver \(driverDTO.driverId)")
                         return Single.just(driverDTO.toDomain(driverDetail: nil))
                     }
                     
-                    print("🚨driverNumber: \(driverNumber)")
                     return self.getDriverDetail(driverNumber: driverNumber)
                         .map { detailDTO in
-                            print("🚨Got detail for driver \(driverNumber)")
                             return driverDTO.toDomain(driverDetail: detailDTO)
                         }
                         .catch { error in
-                            print("🚨Error getting detail for driver \(driverNumber): \(error)")
                             // 개별 드라이버 실패 시 기본 정보만 반환
                             return Single.just(driverDTO.toDomain(driverDetail: nil))
                         }
@@ -77,7 +68,6 @@ extension DefaultDriverRepository {
                 return Single.zip(driverSingles)
             }
             .catch { error in
-                print("🚨Repository error: \(error)")
                 return Single.error(self.handle(error))
             }
     }
