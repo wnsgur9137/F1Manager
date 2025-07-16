@@ -10,6 +10,25 @@ import Foundation
 import RxSwift
 import Moya
 
+// MARK: - Driver
+public extension NetworkManager {
+    func request(_ target: DriverTargetType) -> Single<Any> {
+        return driverProvider
+            .request(target)
+            .mapJSON()
+    }
+    
+    func request<T: Decodable>(
+        _ target: DriverTargetType,
+        type: T.Type
+    ) -> Single<T> {
+        return driverProvider
+            .request(target)
+            .map(T.self, using: JSONDecoder())
+    }
+}
+
+// MARK: - OpenF1Driver
 public extension NetworkManager {
     func request(_ target: OpenF1DriverTargetType) -> Single<Any> {
         return openF1DriverProvider

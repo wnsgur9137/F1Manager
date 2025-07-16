@@ -32,10 +32,13 @@ public final class DefaultDriverUseCase: DriverUseCase {
         return error
     }
     
-    public func getDriver(driverNumber: Int) -> Single<DriverDetailModel> {
-        let driverDetailEntity = repository.getDriverDetail(driverNumber: driverNumber)
-        return driverDetailEntity
-            .map { $0.toModel() }
+    public func getDrivers(year: Int) -> Single<[DriverModel]> {
+        let driverEntities = repository.getDrivers(year: year)
+        return driverEntities
+            .map { $0.map {
+                print($0.toModel())
+                return $0.toModel()
+            } }
             .catch { error in
                 return .error(self.handle(error))
             }

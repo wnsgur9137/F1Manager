@@ -60,7 +60,7 @@ public final class HomeViewController: UIViewController, View {
     
     // MARK: - Properties
     
-    private var drivers: [DriverDetailModel] = []
+    private var drivers: [DriverModel] = []
     
     public var disposeBag = DisposeBag()
     
@@ -113,15 +113,13 @@ extension HomeViewController {
     }
     
     private func bindState(_ reactor: HomeReactor) {
-        reactor.pulse(\.$driver)
-            .bind(onNext: { [weak self] driver in
-                print(driver)
+        reactor.pulse(\.$drivers)
+            .compactMap { $0 }
+            .bind(onNext: { [weak self] drivers in
+                print(drivers)
+                self?.drivers = drivers
+                self?.driversCollectionView.reloadData()
             })
-//            .compactMap { $0 }
-//            .bind(onNext: { [weak self] drivers in
-//                self?.drivers = Array(drivers.prefix(4))
-//                self?.driversCollectionView.reloadData()
-//            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$error)

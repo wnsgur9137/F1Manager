@@ -1,5 +1,5 @@
 //
-//  DriverDetailModel.swift
+//  DriverModel.swift
 //  BasePresentation
 //
 //  Created by JunHyeok Lee on 7/15/25.
@@ -8,44 +8,47 @@
 
 import Foundation
 
-public struct DriverDetailModel {
-    public let broadcastName: String
-    public let countryCode: String?
-    public let driverNumber: Int
+public struct DriverModel {
+    public let driverId: String
+    public let driverNumber: String?
+    public let driverCode: String?
+    public let wikipediaURL: String?
     public let fullName: String
-    public let firstName: String
-    public let lastName: String
-    public let headshotImageURL: String
-    public let nameAcronym: String
-    public let meetingKey: Int
-    public let sessionKey: Int
-    public let teamName: String
-    public let teamColour: String
+    public let givenName: String
+    public let familyName: String
+    public let dateOfBirth: String?
+    public let countryCode: String?
+    public let country: String?
+    public let headshotImageURL: String?
+    public let teamName: String?
+    public let teamColour: String?
     
     public init(
-        broadcastName: String,
-        countryCode: String?,
-        driverNumber: Int,
+        driverId: String,
+        driverNumber: String?,
+        driverCode: String?,
+        wikipediaURL: String?,
         fullName: String,
-        firstName: String,
-        lastName: String,
-        headshotImageURL: String,
-        nameAcronym: String,
-        meetingKey: Int,
-        sessionKey: Int,
-        teamName: String,
-        teamColour: String
+        givenName: String,
+        familyName: String,
+        dateOfBirth: String?,
+        countryCode: String?,
+        country: String?,
+        headshotImageURL: String?,
+        teamName: String?,
+        teamColour: String?
     ) {
-        self.broadcastName = broadcastName
-        self.countryCode = countryCode
+        self.driverId = driverId
         self.driverNumber = driverNumber
+        self.driverCode = driverCode
+        self.wikipediaURL = wikipediaURL
         self.fullName = fullName
-        self.firstName = firstName
-        self.lastName = lastName
+        self.givenName = givenName
+        self.familyName = familyName
+        self.dateOfBirth = dateOfBirth
+        self.countryCode = countryCode
+        self.country = country
         self.headshotImageURL = headshotImageURL
-        self.nameAcronym = nameAcronym
-        self.meetingKey = meetingKey
-        self.sessionKey = sessionKey
         self.teamName = teamName
         self.teamColour = teamColour
     }

@@ -30,12 +30,12 @@ public final class HomeReactor: Reactor {
     }
     
     public enum Mutation {
-        case setDriver(DriverDetailModel)
+        case setDrivers([DriverModel])
         case setError(Error)
     }
     
     public struct State {
-        @Pulse var driver: DriverDetailModel?
+        @Pulse var drivers: [DriverModel]?
         @Pulse var error: HomeError?
     }
     
@@ -63,11 +63,11 @@ extension HomeReactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad:
-            let driver = driverUseCase.getDriver(driverNumber: 1)
+            let drivers = driverUseCase.getDrivers(year: 2025)
                 .asObservable()
-                .map { Mutation.setDriver($0) }
+                .map { Mutation.setDrivers($0) }
                 .catch { .just(.setError($0)) }
-            return driver
+            return drivers
             
         case .navigateToAllDrivers:
             return .empty()
@@ -80,8 +80,8 @@ extension HomeReactor {
     ) -> State {
         var state = state
         switch mutation {
-        case let .setDriver(driver):
-            state.driver = driver
+        case let .setDrivers(drivers):
+            state.drivers = drivers
         case let .setError(error):
             state.error = handle(error)
         }

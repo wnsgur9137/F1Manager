@@ -21,7 +21,9 @@ public final class AppDIContainer {
         return NetworkManager(
             withTest: false,
             withFail: false,
-            baseURL: "https://api.openf1.org"
+            baseURL: "",
+            jolpiBaseURL: "https://api.jolpi.ca/ergast/f1",
+            openF1BaseURL: "https://api.openf1.org"
         )
     }()
     

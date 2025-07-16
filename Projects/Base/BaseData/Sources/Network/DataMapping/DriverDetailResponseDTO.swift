@@ -39,22 +39,3 @@ struct DriverDetailResponseDTO: Decodable {
         case teamColour = "team_colour"
     }
 }
-
-extension DriverDetailResponseDTO {
-    func toDomain() -> DriverDetail {
-        return DriverDetail(
-            broadcastName: broadcastName,
-            countryCode: countryCode,
-            driverNumber: driverNumber,
-            fullName: fullName,
-            firstName: firstName,
-            lastName: lastName,
-            headshotImageURL: headshotImageURL,
-            nameAcronym: nameAcronym,
-            meetingKey: meetingKey,
-            sessionKey: sessionKey,
-            teamName: teamName,
-            teamColour: teamColour
-        )
-    }
-}

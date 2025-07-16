@@ -8,33 +8,69 @@
 
 import Foundation
 
+import BasePresentation
+
 public struct Driver {
     public let driverId: String
-    public let permanentNumber: String?
+    public let driverNumber: String?
     public let driverCode: String?
     public let wikipediaURL: String?
+    public let fullName: String
     public let givenName: String
     public let familyName: String
     public let dateOfBirth: String?
-    public let nationality: String?
+    public let countryCode: String?
+    public let country: String?
+    public let headshotImageURL: String?
+    public let teamName: String?
+    public let teamColour: String?
     
     public init(
         driverId: String,
-        permanentNumber: String?,
+        driverNumber: String?,
         driverCode: String?,
         wikipediaURL: String?,
         givenName: String,
         familyName: String,
         dateOfBirth: String?,
-        nationality: String?
+        countryCode: String?,
+        country: String?,
+        headshotImageURL: String?,
+        teamName: String?,
+        teamColour: String?
     ) {
         self.driverId = driverId
-        self.permanentNumber = permanentNumber
+        self.driverNumber = driverNumber
         self.driverCode = driverCode
         self.wikipediaURL = wikipediaURL
+        self.fullName = "\(givenName) \(familyName)"
         self.givenName = givenName
         self.familyName = familyName
         self.dateOfBirth = dateOfBirth
-        self.nationality = nationality
+        self.countryCode = countryCode
+        self.country = country
+        self.headshotImageURL = headshotImageURL
+        self.teamName = teamName
+        self.teamColour = teamColour
+    }
+}
+
+extension Driver {
+    func toModel() -> DriverModel {
+        return DriverModel(
+            driverId: driverId,
+            driverNumber: driverNumber,
+            driverCode: driverCode,
+            wikipediaURL: wikipediaURL,
+            fullName: fullName,
+            givenName: givenName,
+            familyName: familyName,
+            dateOfBirth: dateOfBirth,
+            countryCode: countryCode,
+            country: country,
+            headshotImageURL: headshotImageURL,
+            teamName: teamName,
+            teamColour: teamColour
+        )
     }
 }

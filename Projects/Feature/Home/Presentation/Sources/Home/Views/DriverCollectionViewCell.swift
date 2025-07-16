@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+
 import BasePresentation
 
 final class DriverCollectionViewCell: UICollectionViewCell {
@@ -166,14 +167,15 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Configuration
     
-    func configure(with driver: DriverDetailModel) {
+    func configure(with driver: DriverModel) {
         driverNumberLabel.text = "\(driver.driverNumber)"
-        firstNameLabel.text = driver.firstName
-        lastNameLabel.text = driver.lastName
+        firstNameLabel.text = driver.givenName
+        lastNameLabel.text = driver.familyName
         teamNameLabel.text = driver.teamName
         
         // 팀 컬러 설정
-        if let teamColor = UIColor(hex: driver.teamColour) {
+        if let teamColor = driver.teamColour,
+           let teamColor = UIColor(hex: teamColor) {
             teamColorView.backgroundColor = teamColor
         }
         
@@ -183,7 +185,9 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         }
         
         // 헤드샷 이미지 로딩 (나중에 Kingfisher 등으로 대체)
-        loadHeadshotImage(from: driver.headshotImageURL)
+        if let headshotImageURL = driver.headshotImageURL {
+            loadHeadshotImage(from: headshotImageURL)
+        }
     }
     
     private func loadHeadshotImage(from urlString: String) {
