@@ -1,5 +1,5 @@
 //
-//  DriverTargetType.swift
+//  OpenF1DriverTargetType.swift
 //  NetworkInfra
 //
 //  Created by JunHyeok Lee on 7/15/25.
@@ -9,11 +9,11 @@
 import Foundation
 import Moya
 
-public enum DriverTargetType {
+public enum OpenF1DriverTargetType {
     case getDriver(driverNumber: Int)
 }
 
-extension DriverTargetType: MoyaErrorHandleable {
+extension OpenF1DriverTargetType: MoyaErrorHandleable {
     public var baseURL: URL {
         return URL(string: "https://api.openf1.org")!
     }
@@ -68,7 +68,7 @@ extension DriverTargetType: MoyaErrorHandleable {
     }
 }
 
-extension DriverTargetType {
+extension OpenF1DriverTargetType {
     public var sampleData: Data {
         switch self {
         case let .getDriver(driverNumber):

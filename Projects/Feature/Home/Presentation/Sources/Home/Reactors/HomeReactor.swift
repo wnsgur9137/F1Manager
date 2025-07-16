@@ -13,7 +13,9 @@ import BasePresentation
 
 public struct HomeFlowAction {
     
-    public init() { }
+    public init() {
+        
+    }
 }
 
 enum HomeError: Error {
@@ -24,15 +26,16 @@ public final class HomeReactor: Reactor {
     
     public enum Action {
         case viewDidLoad
+        case navigateToAllDrivers
     }
     
     public enum Mutation {
-        case setDriver(DriverModel)
+        case setDriver(DriverDetailModel)
         case setError(Error)
     }
     
     public struct State {
-        @Pulse var driver: DriverModel?
+        @Pulse var driver: DriverDetailModel?
         @Pulse var error: HomeError?
     }
     
@@ -65,6 +68,9 @@ extension HomeReactor {
                 .map { Mutation.setDriver($0) }
                 .catch { .just(.setError($0)) }
             return driver
+            
+        case .navigateToAllDrivers:
+            return .empty()
         }
     }
     
@@ -74,8 +80,8 @@ extension HomeReactor {
     ) -> State {
         var state = state
         switch mutation {
-        case let .setDriver(driverModel):
-            state.driver = driverModel
+        case let .setDriver(driver):
+            state.driver = driver
         case let .setError(error):
             state.error = handle(error)
         }

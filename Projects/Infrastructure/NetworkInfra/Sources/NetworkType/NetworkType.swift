@@ -77,6 +77,10 @@ extension NetworkType {
     
     func request(_ route: T) -> Single<Moya.Response> {
         let actualRequest = self.provider.request(route)
+            .catch { error in
+                print("🚨 Request error: \(error)")
+                return .error(error)
+            }
         return actualRequest
     }
 }

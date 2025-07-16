@@ -1,5 +1,5 @@
 //
-//  DriverModel.swift
+//  DriverDetailModel.swift
 //  BasePresentation
 //
 //  Created by JunHyeok Lee on 7/15/25.
@@ -8,19 +8,19 @@
 
 import Foundation
 
-public struct DriverModel {
-    let broadcastName: String
-    let countryCode: String?
-    let driverNumber: Int
-    let fullName: String
-    let firstName: String
-    let lastName: String
-    let headshotImageURL: String
-    let nameAcronym: String
-    let meetingKey: Int
-    let sessionKey: Int
-    let teamName: String
-    let teamColour: String
+public struct DriverDetailModel {
+    public let broadcastName: String
+    public let countryCode: String?
+    public let driverNumber: Int
+    public let fullName: String
+    public let firstName: String
+    public let lastName: String
+    public let headshotImageURL: String
+    public let nameAcronym: String
+    public let meetingKey: Int
+    public let sessionKey: Int
+    public let teamName: String
+    public let teamColour: String
     
     public init(
         broadcastName: String,

@@ -41,7 +41,9 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
     }
     
     public func showHomeViewController() {
-        let flowAction = HomeFlowAction()
+        let flowAction = HomeFlowAction(
+            
+        )
         let viewController = dependencies.makeHomeViewController(flowAction: flowAction)
         self.navigationController?.viewControllers = [viewController]
     }

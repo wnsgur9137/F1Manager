@@ -33,7 +33,7 @@ public final class DefaultDriverRepository: DriverRepository {
         return error
     }
     
-    public func getDriver(driverNumber: Int) -> Single<Driver> {
+    public func getDriverDetail(driverNumber: Int) -> Single<DriverDetail> {
         let driverDTO = networkManager.getDriver(driverNumber: driverNumber)
         return driverDTO.map { $0.toDomain() }
     }

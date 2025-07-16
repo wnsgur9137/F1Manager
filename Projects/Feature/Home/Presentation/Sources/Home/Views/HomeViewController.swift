@@ -20,7 +20,47 @@ public final class HomeViewController: UIViewController, View {
     
     private let navigationBar = NavigationBar()
     
+    private lazy var driversCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 12
+        layout.minimumInteritemSpacing = 0
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.register(DriverCollectionViewCell.self, forCellWithReuseIdentifier: DriverCollectionViewCell.identifier)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        return collectionView
+    }()
+    
+    private let sectionHeaderView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private let driversLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Drivers"
+        label.font = .systemFont(ofSize: 24, weight: .bold)
+        label.textColor = .label
+        return label
+    }()
+    
+    private let seeAllButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("See All", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.setTitleColor(.systemBlue, for: .normal)
+        return button
+    }()
+    
     // MARK: - Properties
+    
+    private var drivers: [DriverDetailModel] = []
     
     public var disposeBag = DisposeBag()
     
@@ -44,8 +84,17 @@ public final class HomeViewController: UIViewController, View {
     public override func viewDidLoad() {
         super.viewDidLoad()
         navigationBar.backgroundColor = .brown
+        setupSeeAllButton()
         addSubviews()
         setupLayoutConstraints()
+    }
+    
+    private func setupSeeAllButton() {
+        seeAllButton.addTarget(self, action: #selector(seeAllButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc private func seeAllButtonTapped() {
+        reactor?.action.onNext(.navigateToAllDrivers)
     }
     
     public func bind(reactor: HomeReactor) {
@@ -65,10 +114,14 @@ extension HomeViewController {
     
     private func bindState(_ reactor: HomeReactor) {
         reactor.pulse(\.$driver)
-            .compactMap { $0 }
-            .bind(onNext: { driver in
+            .bind(onNext: { [weak self] driver in
                 print(driver)
             })
+//            .compactMap { $0 }
+//            .bind(onNext: { [weak self] drivers in
+//                self?.drivers = Array(drivers.prefix(4))
+//                self?.driversCollectionView.reloadData()
+//            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$error)
@@ -84,6 +137,12 @@ extension HomeViewController {
 extension HomeViewController {
     private func addSubviews() {
         view.addSubview(navigationBar)
+        view.addSubview(sectionHeaderView)
+        view.addSubview(driversCollectionView)
+        
+        [driversLabel, seeAllButton].forEach {
+            sectionHeaderView.addSubview($0)
+        }
     }
     
     private func setupLayoutConstraints() {
@@ -91,5 +150,51 @@ extension HomeViewController {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
         }
+        
+        sectionHeaderView.snp.makeConstraints {
+            $0.top.equalTo(navigationBar.snp.bottom).offset(20)
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.height.equalTo(44)
+        }
+        
+        driversLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+        }
+        
+        seeAllButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+        }
+        
+        driversCollectionView.snp.makeConstraints {
+            $0.top.equalTo(sectionHeaderView.snp.bottom).offset(16)
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.height.equalTo(180)
+        }
+    }
+}
+
+// MARK: - UICollectionViewDataSource
+extension HomeViewController: UICollectionViewDataSource {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return drivers.count
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DriverCollectionViewCell.identifier, for: indexPath) as? DriverCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        
+        let driver = drivers[indexPath.item]
+        cell.configure(with: driver)
+        return cell
+    }
+}
+
+// MARK: - UICollectionViewDelegateFlowLayout
+extension HomeViewController: UICollectionViewDelegateFlowLayout {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: 140, height: 180)
     }
 }

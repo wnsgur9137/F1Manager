@@ -13,10 +13,10 @@ import Moya
 import NetworkInfra
 
 extension NetworkManager {
-    func getDriver(driverNumber: Int) -> Single<DriverResponseDTO> {
+    func getDriver(driverNumber: Int) -> Single<DriverDetailResponseDTO> {
         return request(
             .getDriver(driverNumber: driverNumber),
-            type: [DriverResponseDTO].self
+            type: [DriverDetailResponseDTO].self
         )
         .flatMap { drivers in
             guard let driver = drivers.first else {

@@ -10,5 +10,5 @@ import Foundation
 import RxSwift
 
 public protocol DriverRepository {
-    func getDriver(driverNumber: Int) -> Single<Driver>
+    func getDriverDetail(driverNumber: Int) -> Single<DriverDetail>
 }

@@ -2,72 +2,39 @@
 //  Driver.swift
 //  BaseDomain
 //
-//  Created by JunHyeok Lee on 7/15/25.
+//  Created by JunHyeok Lee on 7/16/25.
 //  Copyright © 2025 com.junhyeok.F1Manager. All rights reserved.
 //
 
 import Foundation
 
-import BasePresentation
-
 public struct Driver {
-    let broadcastName: String
-    let countryCode: String?
-    let driverNumber: Int
-    let fullName: String
-    let firstName: String
-    let lastName: String
-    let headshotImageURL: String
-    let nameAcronym: String
-    let meetingKey: Int
-    let sessionKey: Int
-    let teamName: String
-    let teamColour: String
+    public let driverId: String
+    public let permanentNumber: String?
+    public let driverCode: String?
+    public let wikipediaURL: String?
+    public let givenName: String
+    public let familyName: String
+    public let dateOfBirth: String?
+    public let nationality: String?
     
     public init(
-        broadcastName: String,
-        countryCode: String?,
-        driverNumber: Int,
-        fullName: String,
-        firstName: String,
-        lastName: String,
-        headshotImageURL: String,
-        nameAcronym: String,
-        meetingKey: Int,
-        sessionKey: Int,
-        teamName: String,
-        teamColour: String
+        driverId: String,
+        permanentNumber: String?,
+        driverCode: String?,
+        wikipediaURL: String?,
+        givenName: String,
+        familyName: String,
+        dateOfBirth: String?,
+        nationality: String?
     ) {
-        self.broadcastName = broadcastName
-        self.countryCode = countryCode
-        self.driverNumber = driverNumber
-        self.fullName = fullName
-        self.firstName = firstName
-        self.lastName = lastName
-        self.headshotImageURL = headshotImageURL
-        self.nameAcronym = nameAcronym
-        self.meetingKey = meetingKey
-        self.sessionKey = sessionKey
-        self.teamName = teamName
-        self.teamColour = teamColour
-    }
-}
-
-extension Driver {
-    func toModel() -> DriverModel {
-        return DriverModel(
-            broadcastName: broadcastName,
-            countryCode: countryCode,
-            driverNumber: driverNumber,
-            fullName: fullName,
-            firstName: firstName,
-            lastName: lastName,
-            headshotImageURL: headshotImageURL,
-            nameAcronym: nameAcronym,
-            meetingKey: meetingKey,
-            sessionKey: sessionKey,
-            teamName: teamName,
-            teamColour: teamColour
-        )
+        self.driverId = driverId
+        self.permanentNumber = permanentNumber
+        self.driverCode = driverCode
+        self.wikipediaURL = wikipediaURL
+        self.givenName = givenName
+        self.familyName = familyName
+        self.dateOfBirth = dateOfBirth
+        self.nationality = nationality
     }
 }
