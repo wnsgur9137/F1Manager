@@ -45,7 +45,7 @@ public final class HomeViewController: UIViewController, View {
     private let driversLabel: UILabel = {
         let label = UILabel()
         label.text = "Drivers"
-        label.font = .systemFont(ofSize: 24, weight: .bold)
+        label.font = .f1(.bold, size: 24)
         label.textColor = .label
         return label
     }()
@@ -53,7 +53,7 @@ public final class HomeViewController: UIViewController, View {
     private let seeAllButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("See All", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.titleLabel?.font = .f1(.regular, size: 16)
         button.setTitleColor(.systemBlue, for: .normal)
         return button
     }()
@@ -98,7 +98,7 @@ public final class HomeViewController: UIViewController, View {
     }
     
     @objc private func seeAllButtonTapped() {
-        reactor?.action.onNext(.navigateToAllDrivers)
+        reactor?.action.onNext(.navigateToDriverList)
     }
     
     public func bind(reactor: HomeReactor) {

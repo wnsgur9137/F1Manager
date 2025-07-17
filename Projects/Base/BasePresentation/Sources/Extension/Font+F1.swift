@@ -10,12 +10,6 @@ import UIKit
 
 extension UIFont {
     
-    private enum FontName: String {
-        case f1Bold = "Formula1-Bold"
-        case f1Regular = "Formula1-Regular"
-        case f1Wide = "Formula1-Wide"
-    }
-    
     public enum F1FontWeight {
         case bold
         case regular
@@ -30,24 +24,18 @@ extension UIFont {
     }
     
     private static func f1Bold(size: CGFloat) -> UIFont {
-        guard let font = UIFont(name: FontName.f1Regular.rawValue, size: size) else {
-            return UIFont.systemFont(ofSize: size, weight: .bold)
-        }
-        return font
+        BasePresentationFontFamily.registerAllCustomFonts()
+        return BasePresentationFontFamily.Formula1.displayBold.font(size: size)
     }
     
     private static func f1Regular(size: CGFloat) -> UIFont {
-        guard let font = UIFont(name: FontName.f1Regular.rawValue, size: size) else {
-            return UIFont.systemFont(ofSize: size, weight: .bold)
-        }
-        return font
+        BasePresentationFontFamily.registerAllCustomFonts()
+        return BasePresentationFontFamily.Formula1.displayRegular.font(size: size)
     }
     
     private static func f1Wide(size: CGFloat) -> UIFont {
-        guard let font = UIFont(name: FontName.f1Wide.rawValue, size: size) else {
-            return UIFont.systemFont(ofSize: size, weight: .bold)
-        }
-        return font
+        BasePresentationFontFamily.registerAllCustomFonts()
+        return BasePresentationFontFamily.Formula1.displayWide.font(size: size)
     }
     
     public static func f1(

@@ -1,5 +1,5 @@
 //
-//  AllDriversViewController.swift
+//  DriverListViewController.swift
 //  HomePresentation
 //
 //  Created by JUNHYEOK LEE on 7/17/25.
@@ -14,7 +14,7 @@ import SnapKit
 
 import BasePresentation
 
-public final class AllDriversViewController: UIViewController, View {
+public final class DriverListViewController: UIViewController, View {
     
     // MARK: - UI Components
     
@@ -44,8 +44,8 @@ public final class AllDriversViewController: UIViewController, View {
     
     // MARK: - Life cycle
     
-    public static func create(with reactor: AllDriversReactor) -> AllDriversViewController {
-        let viewController = AllDriversViewController()
+    public static func create(with reactor: DriverListReactor) -> DriverListViewController {
+        let viewController = DriverListViewController()
         viewController.hidesBottomBarWhenPushed = true
         viewController.reactor = reactor
         return viewController
@@ -77,27 +77,27 @@ public final class AllDriversViewController: UIViewController, View {
         navigationBar.setTitle("All Drivers")
     }
     
-    public func bind(reactor: AllDriversReactor) {
+    public func bind(reactor: DriverListReactor) {
         bindAction(reactor)
         bindState(reactor)
     }
 }
 
 // MARK: - Bind
-extension AllDriversViewController {
-    private func bindAction(_ reactor: AllDriversReactor) {
+extension DriverListViewController {
+    private func bindAction(_ reactor: DriverListReactor) {
         rx.viewDidLoad
-            .map { AllDriversReactor.Action.viewDidLoad }
+            .map { DriverListReactor.Action.viewDidLoad }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         navigationBar.didTapBackButton
-            .map { AllDriversReactor.Action.backButtonTapped }
+            .map { DriverListReactor.Action.backButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
-    private func bindState(_ reactor: AllDriversReactor) {
+    private func bindState(_ reactor: DriverListReactor) {
         reactor.pulse(\.$drivers)
             .compactMap { $0 }
             .bind(onNext: { [weak self] drivers in
@@ -139,7 +139,7 @@ extension AllDriversViewController {
 }
 
 // MARK: - Layout
-extension AllDriversViewController {
+extension DriverListViewController {
     private func addSubviews() {
         view.addSubview(navigationBar)
         view.addSubview(driversTableView)
@@ -164,7 +164,7 @@ extension AllDriversViewController {
 }
 
 // MARK: - UITableViewDataSource
-extension AllDriversViewController: UITableViewDataSource {
+extension DriverListViewController: UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return drivers.count
     }
@@ -181,7 +181,7 @@ extension AllDriversViewController: UITableViewDataSource {
 }
 
 // MARK: - UITableViewDelegate
-extension AllDriversViewController: UITableViewDelegate {
+extension DriverListViewController: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80
     }

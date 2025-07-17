@@ -30,6 +30,7 @@ public final class NavigationBar: UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
+        label.font = .f1(.bold, size: 18)
         return label
     }()
     

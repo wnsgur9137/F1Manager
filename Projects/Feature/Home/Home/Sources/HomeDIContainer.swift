@@ -64,18 +64,18 @@ extension HomeDIContainer: HomeCoordinatorDependencies {
         return viewController
     }
     
-    private func makeAllDriversReactor(flowAction: AllDriversFlowAction) -> AllDriversReactor {
+    private func makeDriverListReactor(flowAction: DriverListFlowAction) -> DriverListReactor {
         let driverUseCase = makeDriverUseCase()
-        let reactor = AllDriversReactor(
+        let reactor = DriverListReactor(
             flowAction: flowAction,
             driverUseCase: driverUseCase
         )
         return reactor
     }
     
-    public func makeAllDriversViewController(flowAction: AllDriversFlowAction) -> AllDriversViewController {
-        let reactor = makeAllDriversReactor(flowAction: flowAction)
-        let viewController = AllDriversViewController.create(with: reactor)
+    public func makeDriverListViewController(flowAction: DriverListFlowAction) -> DriverListViewController {
+        let reactor = makeDriverListReactor(flowAction: flowAction)
+        let viewController = DriverListViewController.create(with: reactor)
         return viewController
     }
     

@@ -1,5 +1,5 @@
 //
-//  AllDriversReactor.swift
+//  DriverListReactor.swift
 //  HomePresentation
 //
 //  Created by JUNHYEOK LEE on 7/17/25.
@@ -12,7 +12,7 @@ import RxSwift
 
 import BasePresentation
 
-public struct AllDriversFlowAction {
+public struct DriverListFlowAction {
     let backButtonTapped: () -> Void
     let driverSelected: (DriverModel) -> Void
     
@@ -25,12 +25,12 @@ public struct AllDriversFlowAction {
     }
 }
 
-enum AllDriversError: Error {
+enum DriverListError: Error {
     case driversNotFound
     case networkError
 }
 
-public final class AllDriversReactor: Reactor {
+public final class DriverListReactor: Reactor {
     
     public enum Action {
         case viewDidLoad
@@ -48,32 +48,32 @@ public final class AllDriversReactor: Reactor {
     public struct State {
         @Pulse var drivers: [DriverModel]?
         @Pulse var isLoading: Bool?
-        @Pulse var error: AllDriversError?
+        @Pulse var error: DriverListError?
     }
     
     public var initialState = State()
-    private let flowAction: AllDriversFlowAction
+    private let flowAction: DriverListFlowAction
     private let driverUseCase: DriverUseCase
     private let disposeBag = DisposeBag()
     
     public init(
-        flowAction: AllDriversFlowAction,
+        flowAction: DriverListFlowAction,
         driverUseCase: DriverUseCase
     ) {
         self.flowAction = flowAction
         self.driverUseCase = driverUseCase
     }
     
-    private func handle(_ error: Error) -> AllDriversError? {
-        guard let allDriversError = error as? AllDriversError else {
+    private func handle(_ error: Error) -> DriverListError? {
+        guard let driverListError = error as? DriverListError else {
             return .networkError
         }
-        return allDriversError
+        return driverListError
     }
 }
 
 // MARK: - React
-extension AllDriversReactor {
+extension DriverListReactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad, .refreshDrivers:

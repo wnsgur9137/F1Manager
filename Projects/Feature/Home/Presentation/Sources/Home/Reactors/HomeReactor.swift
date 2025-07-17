@@ -12,10 +12,10 @@ import ReactorKit
 import BasePresentation
 
 public struct HomeFlowAction {
-    let navigateToAllDrivers: () -> Void
+    let navigateToDriverList: () -> Void
     
-    public init(navigateToAllDrivers: @escaping () -> Void) {
-        self.navigateToAllDrivers = navigateToAllDrivers
+    public init(navigateToDriverList: @escaping () -> Void) {
+        self.navigateToDriverList = navigateToDriverList
     }
 }
 
@@ -27,7 +27,7 @@ public final class HomeReactor: Reactor {
     
     public enum Action {
         case viewDidLoad
-        case navigateToAllDrivers
+        case navigateToDriverList
     }
     
     public enum Mutation {
@@ -70,8 +70,8 @@ extension HomeReactor {
                 .catch { .just(.setError($0)) }
             return drivers
             
-        case .navigateToAllDrivers:
-            flowAction.navigateToAllDrivers()
+        case .navigateToDriverList:
+            flowAction.navigateToDriverList()
             return .empty()
         }
     }

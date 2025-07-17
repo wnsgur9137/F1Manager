@@ -43,7 +43,7 @@ final class DriverListTableViewCell: UITableViewCell {
     
     private let driverNumberLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.font = .f1(.bold, size: 16)
         label.textColor = .white
         label.textAlignment = .center
         label.backgroundColor = .black
@@ -62,14 +62,14 @@ final class DriverListTableViewCell: UITableViewCell {
     
     private let fullNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.font = .f1(.bold, size: 18)
         label.textColor = .label
         return label
     }()
     
     private let teamNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.font = .f1(.regular, size: 14)
         label.textColor = .secondaryLabel
         return label
     }()
@@ -84,13 +84,13 @@ final class DriverListTableViewCell: UITableViewCell {
     
     private let countryFlagLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 18)
+        label.font = .f1(.regular, size: 18)
         return label
     }()
     
     private let countryLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.font = .f1(.regular, size: 12)
         label.textColor = .tertiaryLabel
         return label
     }()
@@ -230,4 +230,9 @@ final class DriverListTableViewCell: UITableViewCell {
             }
         }.resume()
     }
+}
+
+// MARK: - Layout
+extension DriverListTableViewCell {
+    
 }
