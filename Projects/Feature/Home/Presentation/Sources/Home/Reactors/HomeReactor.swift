@@ -12,9 +12,10 @@ import ReactorKit
 import BasePresentation
 
 public struct HomeFlowAction {
+    let navigateToAllDrivers: () -> Void
     
-    public init() {
-        
+    public init(navigateToAllDrivers: @escaping () -> Void) {
+        self.navigateToAllDrivers = navigateToAllDrivers
     }
 }
 
@@ -70,6 +71,7 @@ extension HomeReactor {
             return drivers
             
         case .navigateToAllDrivers:
+            flowAction.navigateToAllDrivers()
             return .empty()
         }
     }

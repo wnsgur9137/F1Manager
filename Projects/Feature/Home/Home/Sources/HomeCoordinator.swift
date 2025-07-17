@@ -13,6 +13,7 @@ import BasePresentation
 
 public protocol HomeCoordinatorDependencies {
     func makeHomeViewController(flowAction: HomeFlowAction) -> HomeViewController
+    func makeAllDriversViewController(flowAction: AllDriversFlowAction) -> AllDriversViewController
 }
 
 public protocol HomeCoordinator: Coordinator {
@@ -42,10 +43,27 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
     
     public func showHomeViewController() {
         let flowAction = HomeFlowAction(
-            
+            navigateToAllDrivers: showAllDriversViewController
         )
         let viewController = dependencies.makeHomeViewController(flowAction: flowAction)
         self.navigationController?.viewControllers = [viewController]
+    }
+    
+    private func showAllDriversViewController() {
+        let flowAction = AllDriversFlowAction(
+            backButtonTapped: popViewController,
+            driverSelected: showDriverDetailViewController
+        )
+        let viewController = dependencies.makeAllDriversViewController(flowAction: flowAction)
+        self.navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    private func showDriverDetailViewController(driverModel: DriverModel) {
+        
+    }
+    
+    private func popViewController() {
+        
     }
     
 }

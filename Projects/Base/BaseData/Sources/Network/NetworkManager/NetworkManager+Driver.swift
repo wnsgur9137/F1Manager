@@ -35,4 +35,11 @@ extension NetworkManager {
             return .just(driver)
         }
     }
+    
+    func getLatestDriverDetails() -> Single<[DriverDetailResponseDTO]> {
+        return request(
+            .getLatestDriverDetails,
+            type: [DriverDetailResponseDTO].self
+        )
+    }
 }

@@ -37,38 +37,50 @@ public final class DefaultDriverRepository: DriverRepository {
         let driverDetailDTO = networkManager.getDriverDetail(driverNumber: driverNumber)
         return driverDetailDTO
     }
+    
+    private func getLatestDriverDetails() -> Single<[DriverDetailResponseDTO]> {
+        let driverDetailDTOs = networkManager.getLatestDriverDetails()
+        return driverDetailDTOs
+    }
 }
 
 extension DefaultDriverRepository {
     public func getDrivers(year: Int) -> Single<[Driver]> {
-        return networkManager
-            .getDrivers(year: year)
-            .flatMap { driverDTOs in
-                guard !driverDTOs.isEmpty else {
-                    return Single.just([])
+        return Single.zip(
+            networkManager.getDrivers(year: year),
+            getLatestDriverDetails()
+        )
+        .map { (driverDTOs, driverDetailDTOs) -> [Driver] in
+            guard !driverDTOs.isEmpty else {
+                return []
+            }
+            
+            let drivers: [Driver] = driverDTOs.compactMap { driverDTO in
+                guard let driverNumberString = driverDTO.driverNumber,
+                      let driverNumber = Int(driverNumberString) else {
+                    return driverDTO.toDomain(driverDetail: nil)
                 }
                 
-                let driverSingles: [Single<Driver>] = driverDTOs.map { driverDTO in
-                    guard let driverNumberString = driverDTO.driverNumber,
-                          let driverNumber = Int(driverNumberString) else {
-                        return Single.just(driverDTO.toDomain(driverDetail: nil))
+                // 드라이버 번호가 일치하는 첫 번째 DetailDTO 찾기
+                let matchingDetail = driverDetailDTOs.first { detailDTO in
+                    if driverNumber == 33 { // api에서는 1번을 사용하지 않음 (예시 2025 Max verstappen -> 33)
+                        return detailDTO.driverNumber == 1
+                        || driverNumber == detailDTO.driverNumber
                     }
-                    
-                    return self.getDriverDetail(driverNumber: driverNumber)
-                        .map { detailDTO in
-                            return driverDTO.toDomain(driverDetail: detailDTO)
-                        }
-                        .catch { error in
-                            // 개별 드라이버 실패 시 기본 정보만 반환
-                            return Single.just(driverDTO.toDomain(driverDetail: nil))
-                        }
+                    return driverNumber == detailDTO.driverNumber
                 }
                 
-                // Single.zip 사용 시 모든 Single이 성공해야 함
-                return Single.zip(driverSingles)
+                if let matchingDetail = matchingDetail {
+                    return driverDTO.toDomain(driverDetail: matchingDetail)
+                } else {
+                    return driverDTO.toDomain(driverDetail: nil)
+                }
             }
-            .catch { error in
-                return Single.error(self.handle(error))
-            }
+            
+            return drivers
+        }
+        .catch { error in
+            return Single.error(self.handle(error))
+        }
     }
 }

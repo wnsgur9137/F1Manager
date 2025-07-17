@@ -1,8 +1,8 @@
 //
-//  DriverCollectionViewCell.swift
+//  DriverListTableViewCell.swift
 //  HomePresentation
 //
-//  Created by JUNHYEOK LEE on 7/16/25.
+//  Created by JUNHYEOK LEE on 7/17/25.
 //  Copyright © 2025 com.junhyeok.F1Manager. All rights reserved.
 //
 
@@ -11,9 +11,7 @@ import SnapKit
 
 import BasePresentation
 
-final class DriverCollectionViewCell: UICollectionViewCell {
-    
-    static let identifier = "DriverCollectionViewCell"
+final class DriverListTableViewCell: UITableViewCell {
     
     // MARK: - UI Components
     
@@ -22,8 +20,8 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         view.backgroundColor = .systemBackground
         view.layer.cornerRadius = 12
         view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOffset = CGSize(width: 0, height: 2)
-        view.layer.shadowRadius = 4
+        view.layer.shadowOffset = CGSize(width: 0, height: 1)
+        view.layer.shadowRadius = 3
         view.layer.shadowOpacity = 0.1
         return view
     }()
@@ -32,7 +30,7 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 8
+        imageView.layer.cornerRadius = 25
         imageView.backgroundColor = .systemGray5
         return imageView
     }()
@@ -45,11 +43,11 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     
     private let driverNumberLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.font = .systemFont(ofSize: 16, weight: .bold)
         label.textColor = .white
         label.textAlignment = .center
         label.backgroundColor = .black
-        label.layer.cornerRadius = 12
+        label.layer.cornerRadius = 10
         label.clipsToBounds = true
         return label
     }()
@@ -62,37 +60,53 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         return stackView
     }()
     
-    private let firstNameLabel: UILabel = {
+    private let fullNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .secondaryLabel
-        return label
-    }()
-    
-    private let lastNameLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.font = .systemFont(ofSize: 18, weight: .bold)
         label.textColor = .label
         return label
     }()
     
     private let teamNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.font = .systemFont(ofSize: 14, weight: .medium)
         label.textColor = .secondaryLabel
         return label
     }()
     
+    private let countryInfoStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 6
+        stackView.alignment = .center
+        return stackView
+    }()
+    
     private let countryFlagLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 20)
+        label.font = .systemFont(ofSize: 18)
         return label
+    }()
+    
+    private let countryLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.textColor = .tertiaryLabel
+        return label
+    }()
+    
+    private let chevronImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "chevron.right")
+        imageView.tintColor = .tertiaryLabel
+        imageView.contentMode = .scaleAspectFit
+        return imageView
     }()
     
     // MARK: - Initialization
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
         setupConstraints()
     }
@@ -105,86 +119,101 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
         headshotImageView.image = nil
         driverNumberLabel.text = nil
-        firstNameLabel.text = nil
-        lastNameLabel.text = nil
+        fullNameLabel.text = nil
         teamNameLabel.text = nil
         countryFlagLabel.text = nil
+        countryLabel.text = nil
         teamColorView.backgroundColor = .clear
     }
     
     // MARK: - Setup
     
     private func setupUI() {
+        backgroundColor = .clear
+        selectionStyle = .none
+        
         contentView.addSubview(containerView)
         
-        [headshotImageView, teamColorView, driverNumberLabel, nameStackView, teamNameLabel, countryFlagLabel].forEach {
+        [headshotImageView, teamColorView, driverNumberLabel, nameStackView, countryInfoStackView, chevronImageView].forEach {
             containerView.addSubview($0)
         }
         
-        [firstNameLabel, lastNameLabel].forEach {
+        [fullNameLabel, teamNameLabel].forEach {
             nameStackView.addArrangedSubview($0)
+        }
+        
+        [countryFlagLabel, countryLabel].forEach {
+            countryInfoStackView.addArrangedSubview($0)
         }
     }
     
     private func setupConstraints() {
         containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(4)
+            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16))
         }
         
         headshotImageView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(12)
-            $0.height.equalTo(80)
+            $0.leading.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(50)
         }
         
         teamColorView.snp.makeConstraints {
-            $0.top.leading.equalToSuperview().inset(8)
+            $0.leading.equalToSuperview().inset(8)
+            $0.centerY.equalToSuperview()
             $0.width.equalTo(4)
             $0.height.equalTo(32)
         }
         
         driverNumberLabel.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(8)
-            $0.width.height.equalTo(24)
-        }
-        
-        countryFlagLabel.snp.makeConstraints {
-            $0.top.equalTo(headshotImageView.snp.bottom).offset(8)
-            $0.leading.equalToSuperview().inset(12)
+            $0.top.trailing.equalToSuperview().inset(12)
+            $0.width.height.equalTo(20)
         }
         
         nameStackView.snp.makeConstraints {
-            $0.top.equalTo(headshotImageView.snp.bottom).offset(8)
-            $0.leading.equalTo(countryFlagLabel.snp.trailing).offset(6)
-            $0.trailing.equalToSuperview().inset(12)
+            $0.leading.equalTo(headshotImageView.snp.trailing).offset(12)
+            $0.top.equalToSuperview().inset(12)
+            $0.trailing.lessThanOrEqualTo(driverNumberLabel.snp.leading).offset(-8)
         }
         
-        teamNameLabel.snp.makeConstraints {
-            $0.top.equalTo(nameStackView.snp.bottom).offset(4)
-            $0.leading.trailing.equalToSuperview().inset(12)
+        countryInfoStackView.snp.makeConstraints {
+            $0.leading.equalTo(headshotImageView.snp.trailing).offset(12)
             $0.bottom.equalToSuperview().inset(12)
+            $0.trailing.lessThanOrEqualTo(chevronImageView.snp.leading).offset(-8)
+        }
+        
+        chevronImageView.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(12)
         }
     }
     
     // MARK: - Configuration
     
     func configure(with driver: DriverModel) {
-        driverNumberLabel.text = "\(driver.driverNumber)"
-        firstNameLabel.text = driver.givenName
-        lastNameLabel.text = driver.familyName
-        teamNameLabel.text = driver.teamName
-        
-        // 팀 컬러 설정
-        if let teamColor = driver.teamColour,
-           let teamColor = UIColor(hex: teamColor) {
-            teamColorView.backgroundColor = teamColor
+        // 드라이버 번호
+        if let driverNumber = driver.driverNumber {
+            driverNumberLabel.text = driverNumber
         }
         
-        // 국가 코드를 플래그 이모지로 변환
+        // 이름
+        fullNameLabel.text = driver.fullName
+        teamNameLabel.text = driver.teamName
+        
+        // 팀 컬러
+        if let teamColor = driver.teamColour,
+           let color = UIColor(hex: teamColor) {
+            teamColorView.backgroundColor = color
+        }
+        
+        // 국가 정보
         if let countryCode = driver.countryCode {
             countryFlagLabel.text = countryCode.flag
         }
+        countryLabel.text = driver.country
         
-        // 헤드샷 이미지 로딩 (나중에 Kingfisher 등으로 대체)
+        // 헤드샷 이미지
         if let headshotImageURL = driver.headshotImageURL {
             loadHeadshotImage(from: headshotImageURL)
         }
@@ -200,46 +229,5 @@ final class DriverCollectionViewCell: UICollectionViewCell {
                 self?.headshotImageView.image = image
             }
         }.resume()
-    }
-}
-
-// MARK: - Extensions
-
-extension UIColor {
-    convenience init?(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        
-        guard Scanner(string: hex).scanHexInt64(&int) else { return nil }
-        
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            return nil
-        }
-        
-        self.init(
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            alpha: Double(a) / 255
-        )
-    }
-}
-
-extension String {
-    var flag: String {
-        let base: UInt32 = 127397
-        var s = ""
-        for v in self.unicodeScalars {
-            s.unicodeScalars.append(UnicodeScalar(base + v.value)!)
-        }
-        return String(s)
     }
 }

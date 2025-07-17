@@ -17,7 +17,7 @@ struct DriverDetailResponseDTO: Decodable {
     let fullName: String
     let firstName: String
     let lastName: String
-    let headshotImageURL: String
+    let headshotImageURL: String?
     let nameAcronym: String
     let meetingKey: Int
     let sessionKey: Int

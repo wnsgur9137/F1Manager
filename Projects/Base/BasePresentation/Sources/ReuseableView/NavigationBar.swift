@@ -50,6 +50,12 @@ public final class NavigationBar: UIView {
     
 }
 
+extension NavigationBar {
+    public func setTitle(_ title: String) {
+        titleLabel.text = title
+    }
+}
+
 // MARK: - Layout
 extension NavigationBar {
     private func addSubviews() {
