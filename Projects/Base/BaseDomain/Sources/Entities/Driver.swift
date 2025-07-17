@@ -2,7 +2,7 @@
 //  Driver.swift
 //  BaseDomain
 //
-//  Created by JunHyeok Lee on 7/15/25.
+//  Created by JunHyeok Lee on 7/16/25.
 //  Copyright © 2025 com.junhyeok.F1Manager. All rights reserved.
 //
 
@@ -11,43 +11,45 @@ import Foundation
 import BasePresentation
 
 public struct Driver {
-    let broadcastName: String
-    let countryCode: String?
-    let driverNumber: Int
-    let fullName: String
-    let firstName: String
-    let lastName: String
-    let headshotImageURL: String
-    let nameAcronym: String
-    let meetingKey: Int
-    let sessionKey: Int
-    let teamName: String
-    let teamColour: String
+    public let driverId: String
+    public let driverNumber: String?
+    public let driverCode: String?
+    public let wikipediaURL: String?
+    public let fullName: String
+    public let givenName: String
+    public let familyName: String
+    public let dateOfBirth: String?
+    public let countryCode: String?
+    public let country: String?
+    public let headshotImageURL: String?
+    public let teamName: String?
+    public let teamColour: String?
     
     public init(
-        broadcastName: String,
+        driverId: String,
+        driverNumber: String?,
+        driverCode: String?,
+        wikipediaURL: String?,
+        givenName: String,
+        familyName: String,
+        dateOfBirth: String?,
         countryCode: String?,
-        driverNumber: Int,
-        fullName: String,
-        firstName: String,
-        lastName: String,
-        headshotImageURL: String,
-        nameAcronym: String,
-        meetingKey: Int,
-        sessionKey: Int,
-        teamName: String,
-        teamColour: String
+        country: String?,
+        headshotImageURL: String?,
+        teamName: String?,
+        teamColour: String?
     ) {
-        self.broadcastName = broadcastName
-        self.countryCode = countryCode
+        self.driverId = driverId
         self.driverNumber = driverNumber
-        self.fullName = fullName
-        self.firstName = firstName
-        self.lastName = lastName
+        self.driverCode = driverCode
+        self.wikipediaURL = wikipediaURL
+        self.fullName = "\(givenName) \(familyName)"
+        self.givenName = givenName
+        self.familyName = familyName
+        self.dateOfBirth = dateOfBirth
+        self.countryCode = countryCode
+        self.country = country
         self.headshotImageURL = headshotImageURL
-        self.nameAcronym = nameAcronym
-        self.meetingKey = meetingKey
-        self.sessionKey = sessionKey
         self.teamName = teamName
         self.teamColour = teamColour
     }
@@ -56,16 +58,17 @@ public struct Driver {
 extension Driver {
     func toModel() -> DriverModel {
         return DriverModel(
-            broadcastName: broadcastName,
-            countryCode: countryCode,
+            driverId: driverId,
             driverNumber: driverNumber,
+            driverCode: driverCode,
+            wikipediaURL: wikipediaURL,
             fullName: fullName,
-            firstName: firstName,
-            lastName: lastName,
+            givenName: givenName,
+            familyName: familyName,
+            dateOfBirth: dateOfBirth,
+            countryCode: countryCode,
+            country: country,
             headshotImageURL: headshotImageURL,
-            nameAcronym: nameAcronym,
-            meetingKey: meetingKey,
-            sessionKey: sessionKey,
             teamName: teamName,
             teamColour: teamColour
         )

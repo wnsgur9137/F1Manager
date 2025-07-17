@@ -12,19 +12,24 @@ import Moya
 
 public final class NetworkManager {
     let applicationProvider: ApplicationNetworkType
+    let openF1DriverProvider: OpenF1DriverNetworkType
     let driverProvider: DriverNetworkType
     
     public init(
         withTest: Bool,
         withFail: Bool,
-        baseURL: String
+        baseURL: String,
+        jolpiBaseURL: String,
+        openF1BaseURL: String
     ) {
         if withTest {
             self.applicationProvider = .stubbingNetworking(baseURL: baseURL, needFail: withFail)
-            self.driverProvider = .stubbingNetworking(baseURL: baseURL, needFail: withFail)
+            self.driverProvider = .stubbingNetworking(baseURL: jolpiBaseURL, needFail: withFail)
+            self.openF1DriverProvider = .stubbingNetworking(baseURL: openF1BaseURL, needFail: withFail)
         } else {
             self.applicationProvider = .defaultNetworking(baseURL: baseURL)
-            self.driverProvider = .defaultNetworking(baseURL: baseURL)
+            self.driverProvider = .defaultNetworking(baseURL: jolpiBaseURL)
+            self.openF1DriverProvider = .defaultNetworking(baseURL: openF1BaseURL)
         }
     }
 }

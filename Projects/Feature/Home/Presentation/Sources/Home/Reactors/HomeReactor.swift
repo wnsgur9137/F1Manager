@@ -12,8 +12,11 @@ import ReactorKit
 import BasePresentation
 
 public struct HomeFlowAction {
+    let navigateToDriverList: () -> Void
     
-    public init() { }
+    public init(navigateToDriverList: @escaping () -> Void) {
+        self.navigateToDriverList = navigateToDriverList
+    }
 }
 
 enum HomeError: Error {
@@ -24,15 +27,16 @@ public final class HomeReactor: Reactor {
     
     public enum Action {
         case viewDidLoad
+        case navigateToDriverList
     }
     
     public enum Mutation {
-        case setDriver(DriverModel)
+        case setDrivers([DriverModel])
         case setError(Error)
     }
     
     public struct State {
-        @Pulse var driver: DriverModel?
+        @Pulse var drivers: [DriverModel]?
         @Pulse var error: HomeError?
     }
     
@@ -60,11 +64,15 @@ extension HomeReactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad:
-            let driver = driverUseCase.getDriver(driverNumber: 1)
+            let drivers = driverUseCase.getDrivers(year: 2025)
                 .asObservable()
-                .map { Mutation.setDriver($0) }
+                .map { Mutation.setDrivers($0) }
                 .catch { .just(.setError($0)) }
-            return driver
+            return drivers
+            
+        case .navigateToDriverList:
+            flowAction.navigateToDriverList()
+            return .empty()
         }
     }
     
@@ -74,16 +82,11 @@ extension HomeReactor {
     ) -> State {
         var state = state
         switch mutation {
-        case let .setDriver(driverModel):
-            state.driver = driverModel
+        case let .setDrivers(drivers):
+            state.drivers = drivers
         case let .setError(error):
             state.error = handle(error)
         }
         return state
     }
-}
-
-// MARK: - FlowAction
-extension HomeReactor {
-    
 }

@@ -1,5 +1,5 @@
 //
-//  ViewController+Rx.swift
+//  UIViewController+Rx.swift
 //  BasePresentation
 //
 //  Created by JunHyeok Lee on 7/15/25.

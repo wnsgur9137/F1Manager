@@ -47,11 +47,13 @@ public final class HomeDIContainer: DIContainer {
 
 extension HomeDIContainer: HomeCoordinatorDependencies {
     
+    // MARK: - Home
+    
     private func makeHomeReactor(flowAction: HomeFlowAction) -> HomeReactor {
-        let useCase = makeDriverUseCase()
+        let driverUseCase = makeDriverUseCase()
         let reactor = HomeReactor(
             flowAction: flowAction,
-            driverUseCase: useCase
+            driverUseCase: driverUseCase
         )
         return reactor
     }
@@ -61,4 +63,20 @@ extension HomeDIContainer: HomeCoordinatorDependencies {
         let viewController = HomeViewController.create(with: reactor)
         return viewController
     }
+    
+    private func makeDriverListReactor(flowAction: DriverListFlowAction) -> DriverListReactor {
+        let driverUseCase = makeDriverUseCase()
+        let reactor = DriverListReactor(
+            flowAction: flowAction,
+            driverUseCase: driverUseCase
+        )
+        return reactor
+    }
+    
+    public func makeDriverListViewController(flowAction: DriverListFlowAction) -> DriverListViewController {
+        let reactor = makeDriverListReactor(flowAction: flowAction)
+        let viewController = DriverListViewController.create(with: reactor)
+        return viewController
+    }
+    
 }

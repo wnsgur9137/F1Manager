@@ -16,5 +16,6 @@ let project: Project = .project(
         .Project.LibraryManager.ReactiveLibraries,
         .Project.LibraryManager.LayoutLibraries,
         .Project.LibraryManager.UILibraries,
-    ]
+    ],
+    hasResource: true
 )

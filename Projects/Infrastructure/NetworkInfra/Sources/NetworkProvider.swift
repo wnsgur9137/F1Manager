@@ -46,14 +46,14 @@ extension NetworkProvider {
 //                    print("response: \(String(describing: String(data: response.data, encoding: .utf8)))")
                 },
                 onError: { rawError in
-                    print("🚨ERROR - \(route.path)")
+                    print("🚨 ERROR - \(route.path)")
                     switch rawError {
                     case NetworkError.requestTimeOut:
-                        print("NetworkError: TimedOut")
+                        print("\tNetworkError: TimedOut")
                     case NetworkError.internetConnection:
-                        print("NetworkError: internetConnection")
+                        print("\tNetworkError: internetConnection")
                     case let NetworkError.rest(error, statusCode, errorCode, message):
-                        print("NetworkError: rest(\(error)")
+                        print("\tNetworkError: rest(\(error)")
                         print("\tError: \(error.localizedDescription)")
                         print("\tStatusCode: \(statusCode ?? 0)")
                         print("\tErrorCode: \(errorCode ?? "null")")
