@@ -91,8 +91,8 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupUI()
-        setupConstraints()
+        addSubviews()
+        setupLayoutConstraints()
     }
     
     required init?(coder: NSCoder) {
@@ -108,59 +108,6 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         teamNameLabel.text = nil
         countryFlagLabel.text = nil
         teamColorView.backgroundColor = .clear
-    }
-    
-    // MARK: - Setup
-    
-    private func setupUI() {
-        contentView.addSubview(containerView)
-        
-        [headshotImageView, teamColorView, driverNumberLabel, nameStackView, teamNameLabel, countryFlagLabel].forEach {
-            containerView.addSubview($0)
-        }
-        
-        [firstNameLabel, lastNameLabel].forEach {
-            nameStackView.addArrangedSubview($0)
-        }
-    }
-    
-    private func setupConstraints() {
-        containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(4)
-        }
-        
-        headshotImageView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(12)
-            $0.height.equalTo(80)
-        }
-        
-        teamColorView.snp.makeConstraints {
-            $0.top.leading.equalToSuperview().inset(8)
-            $0.width.equalTo(4)
-            $0.height.equalTo(32)
-        }
-        
-        driverNumberLabel.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(8)
-            $0.width.height.equalTo(24)
-        }
-        
-        countryFlagLabel.snp.makeConstraints {
-            $0.top.equalTo(headshotImageView.snp.bottom).offset(8)
-            $0.leading.equalToSuperview().inset(12)
-        }
-        
-        nameStackView.snp.makeConstraints {
-            $0.top.equalTo(headshotImageView.snp.bottom).offset(8)
-            $0.leading.equalTo(countryFlagLabel.snp.trailing).offset(6)
-            $0.trailing.equalToSuperview().inset(12)
-        }
-        
-        teamNameLabel.snp.makeConstraints {
-            $0.top.equalTo(nameStackView.snp.bottom).offset(4)
-            $0.leading.trailing.equalToSuperview().inset(12)
-            $0.bottom.equalToSuperview().inset(12)
-        }
     }
     
     // MARK: - Configuration
@@ -198,5 +145,69 @@ final class DriverCollectionViewCell: UICollectionViewCell {
                 self?.headshotImageView.image = image
             }
         }.resume()
+    }
+}
+
+// MARK: - Layout
+extension DriverCollectionViewCell {
+    private func addSubviews() {
+        contentView.addSubview(containerView)
+        
+        [
+            headshotImageView,
+            teamColorView,
+            driverNumberLabel,
+            nameStackView,
+            teamNameLabel,
+            countryFlagLabel
+        ].forEach {
+            containerView.addSubview($0)
+        }
+        
+        [
+            firstNameLabel,
+            lastNameLabel
+        ].forEach {
+            nameStackView.addArrangedSubview($0)
+        }
+    }
+    
+    private func setupLayoutConstraints() {
+        containerView.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(4)
+        }
+        
+        headshotImageView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview().inset(12)
+            $0.height.equalTo(80)
+        }
+        
+        teamColorView.snp.makeConstraints {
+            $0.top.leading.equalToSuperview().inset(8)
+            $0.width.equalTo(4)
+            $0.height.equalTo(32)
+        }
+        
+        driverNumberLabel.snp.makeConstraints {
+            $0.top.trailing.equalToSuperview().inset(8)
+            $0.width.height.equalTo(24)
+        }
+        
+        countryFlagLabel.snp.makeConstraints {
+            $0.top.equalTo(headshotImageView.snp.bottom).offset(8)
+            $0.leading.equalToSuperview().inset(12)
+        }
+        
+        nameStackView.snp.makeConstraints {
+            $0.top.equalTo(headshotImageView.snp.bottom).offset(8)
+            $0.leading.equalTo(countryFlagLabel.snp.trailing).offset(6)
+            $0.trailing.equalToSuperview().inset(12)
+        }
+        
+        teamNameLabel.snp.makeConstraints {
+            $0.top.equalTo(nameStackView.snp.bottom).offset(4)
+            $0.leading.trailing.equalToSuperview().inset(12)
+            $0.bottom.equalToSuperview().inset(12)
+        }
     }
 }

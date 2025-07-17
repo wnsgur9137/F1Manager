@@ -83,7 +83,7 @@ public final class HomeViewController: UIViewController, View {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        navigationBar.backgroundColor = .brown
+        setupNavigationBar()
         setupSeeAllButton()
         addSubviews()
         setupLayoutConstraints()

@@ -108,7 +108,9 @@ final class DriverListTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
-        setupConstraints()
+        
+        addSubviews()
+        setupLayoutConstraints()
     }
     
     required init?(coder: NSCoder) {
@@ -131,62 +133,6 @@ final class DriverListTableViewCell: UITableViewCell {
     private func setupUI() {
         backgroundColor = .clear
         selectionStyle = .none
-        
-        contentView.addSubview(containerView)
-        
-        [headshotImageView, teamColorView, driverNumberLabel, nameStackView, countryInfoStackView, chevronImageView].forEach {
-            containerView.addSubview($0)
-        }
-        
-        [fullNameLabel, teamNameLabel].forEach {
-            nameStackView.addArrangedSubview($0)
-        }
-        
-        [countryFlagLabel, countryLabel].forEach {
-            countryInfoStackView.addArrangedSubview($0)
-        }
-    }
-    
-    private func setupConstraints() {
-        containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16))
-        }
-        
-        headshotImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(50)
-        }
-        
-        teamColorView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(8)
-            $0.centerY.equalToSuperview()
-            $0.width.equalTo(4)
-            $0.height.equalTo(32)
-        }
-        
-        driverNumberLabel.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(12)
-            $0.width.height.equalTo(20)
-        }
-        
-        nameStackView.snp.makeConstraints {
-            $0.leading.equalTo(headshotImageView.snp.trailing).offset(12)
-            $0.top.equalToSuperview().inset(12)
-            $0.trailing.lessThanOrEqualTo(driverNumberLabel.snp.leading).offset(-8)
-        }
-        
-        countryInfoStackView.snp.makeConstraints {
-            $0.leading.equalTo(headshotImageView.snp.trailing).offset(12)
-            $0.bottom.equalToSuperview().inset(12)
-            $0.trailing.lessThanOrEqualTo(chevronImageView.snp.leading).offset(-8)
-        }
-        
-        chevronImageView.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(12)
-        }
     }
     
     // MARK: - Configuration
@@ -234,5 +180,74 @@ final class DriverListTableViewCell: UITableViewCell {
 
 // MARK: - Layout
 extension DriverListTableViewCell {
+    private func addSubviews() {
+        contentView.addSubview(containerView)
+        
+        [
+            headshotImageView,
+            teamColorView,
+            driverNumberLabel,
+            nameStackView,
+            countryInfoStackView,
+            chevronImageView
+        ].forEach {
+            containerView.addSubview($0)
+        }
+        
+        [
+            fullNameLabel,
+            teamNameLabel
+        ].forEach {
+            nameStackView.addArrangedSubview($0)
+        }
+        
+        [
+            countryFlagLabel,
+            countryLabel
+        ].forEach {
+            countryInfoStackView.addArrangedSubview($0)
+        }
+    }
     
+    private func setupLayoutConstraints() {
+        containerView.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16))
+        }
+        
+        headshotImageView.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(50)
+        }
+        
+        teamColorView.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(8)
+            $0.centerY.equalToSuperview()
+            $0.width.equalTo(4)
+            $0.height.equalTo(32)
+        }
+        
+        driverNumberLabel.snp.makeConstraints {
+            $0.top.trailing.equalToSuperview().inset(12)
+            $0.width.height.equalTo(20)
+        }
+        
+        nameStackView.snp.makeConstraints {
+            $0.leading.equalTo(headshotImageView.snp.trailing).offset(12)
+            $0.top.equalToSuperview().inset(12)
+            $0.trailing.lessThanOrEqualTo(driverNumberLabel.snp.leading).offset(-8)
+        }
+        
+        countryInfoStackView.snp.makeConstraints {
+            $0.leading.equalTo(headshotImageView.snp.trailing).offset(12)
+            $0.bottom.equalToSuperview().inset(12)
+            $0.trailing.lessThanOrEqualTo(chevronImageView.snp.leading).offset(-8)
+        }
+        
+        chevronImageView.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(12)
+        }
+    }
 }
