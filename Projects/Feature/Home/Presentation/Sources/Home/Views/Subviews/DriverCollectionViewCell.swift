@@ -17,7 +17,7 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     
     private let containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .cellBackground
         view.layer.cornerRadius = 12
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 2)
@@ -28,7 +28,7 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     
     private let headshotImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 8
         imageView.backgroundColor = .systemGray5
@@ -200,7 +200,7 @@ extension DriverCollectionViewCell {
         
         headshotImageView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview().inset(12)
-            $0.height.equalTo(80)
+            $0.height.equalTo(100)
         }
         
         teamColorView.snp.makeConstraints {

@@ -64,6 +64,8 @@ extension HomeDIContainer: HomeCoordinatorDependencies {
         return viewController
     }
     
+    // MARK: - DriverList
+    
     private func makeDriverListReactor(flowAction: DriverListFlowAction) -> DriverListReactor {
         let driverUseCase = makeDriverUseCase()
         let reactor = DriverListReactor(
@@ -76,6 +78,32 @@ extension HomeDIContainer: HomeCoordinatorDependencies {
     public func makeDriverListViewController(flowAction: DriverListFlowAction) -> DriverListViewController {
         let reactor = makeDriverListReactor(flowAction: flowAction)
         let viewController = DriverListViewController.create(with: reactor)
+        return viewController
+    }
+    
+    // MARK: - DriverDetail
+    
+    private func makeDriverDetailReactor(
+        driver: DriverModel,
+        flowAction: DriverDetailFlowAction
+    ) -> DriverDetailReactor {
+        let driverUseCase = makeDriverUseCase()
+        let reactor = DriverDetailReactor(
+            driver: driver,
+            flowAction: flowAction
+        )
+        return reactor
+    }
+    
+    public func makeDriverDetailViewController(
+        driver: DriverModel,
+        flowAction: DriverDetailFlowAction
+    ) -> DriverDetailViewController {
+        let reactor = makeDriverDetailReactor(
+            driver: driver,
+            flowAction: flowAction
+        )
+        let viewController = DriverDetailViewController.create(with: reactor)
         return viewController
     }
     

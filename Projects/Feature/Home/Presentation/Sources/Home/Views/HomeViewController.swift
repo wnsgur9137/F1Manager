@@ -142,7 +142,10 @@ extension HomeViewController {
         view.addSubview(sectionHeaderView)
         view.addSubview(driversCollectionView)
         
-        [driversLabel, seeAllButton].forEach {
+        [
+            driversLabel,
+            seeAllButton
+        ].forEach {
             sectionHeaderView.addSubview($0)
         }
     }
@@ -172,7 +175,7 @@ extension HomeViewController {
         driversCollectionView.snp.makeConstraints {
             $0.top.equalTo(sectionHeaderView.snp.bottom).offset(16)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(180)
+            $0.height.equalTo(200)
         }
     }
 }
@@ -197,6 +200,12 @@ extension HomeViewController: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegateFlowLayout
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 140, height: 180)
+        return CGSize(width: 140, height: 200)
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard indexPath.item < drivers.count else { return }
+        let selectedDriver = drivers[indexPath.item]
+        reactor?.action.onNext(.driverSelected(selectedDriver))
     }
 }
