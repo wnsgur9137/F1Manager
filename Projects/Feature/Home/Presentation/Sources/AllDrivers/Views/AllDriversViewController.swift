@@ -18,7 +18,7 @@ public final class AllDriversViewController: UIViewController, View {
     
     // MARK: - UI Components
     
-    private let navigationBar = NavigationBar()
+    private let navigationBar = NavigationBar(.popButton)
     
     private lazy var driversTableView: UITableView = {
         let tableView = UITableView()
@@ -46,6 +46,7 @@ public final class AllDriversViewController: UIViewController, View {
     
     public static func create(with reactor: AllDriversReactor) -> AllDriversViewController {
         let viewController = AllDriversViewController()
+        viewController.hidesBottomBarWhenPushed = true
         viewController.reactor = reactor
         return viewController
     }
@@ -87,6 +88,11 @@ extension AllDriversViewController {
     private func bindAction(_ reactor: AllDriversReactor) {
         rx.viewDidLoad
             .map { AllDriversReactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        navigationBar.didTapBackButton
+            .map { AllDriversReactor.Action.backButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -148,7 +154,7 @@ extension AllDriversViewController {
         
         driversTableView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
-            $0.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.bottom.equalTo(view)
         }
         
         loadingIndicator.snp.makeConstraints {

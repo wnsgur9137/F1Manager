@@ -18,7 +18,7 @@ public final class HomeViewController: UIViewController, View {
     
     // MARK: - UI Instances
     
-    private let navigationBar = NavigationBar()
+    private let navigationBar = NavigationBar(.nonButton)
     
     private lazy var driversCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -87,6 +87,10 @@ public final class HomeViewController: UIViewController, View {
         setupSeeAllButton()
         addSubviews()
         setupLayoutConstraints()
+    }
+    
+    private func setupNavigationBar() {
+        navigationBar.setTitle("F1 Manager")
     }
     
     private func setupSeeAllButton() {

@@ -63,7 +63,7 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
     }
     
     private func popViewController() {
-        
+        navigationController?.popViewController(animated: true)
     }
     
 }

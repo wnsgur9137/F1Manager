@@ -13,16 +13,23 @@ import SnapKit
 
 public final class NavigationBar: UIView {
     
+    public enum NavigationType {
+        case nonButton
+        case dismissButton
+        case popButton
+    }
+    
     // MARK: - UI Instances
     
     private let backButton: UIButton = {
         let button = UIButton()
+        button.isHidden = true
+        button.tintColor = .label
         return button
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "1235"
         return label
     }()
     
@@ -35,17 +42,42 @@ public final class NavigationBar: UIView {
     
     // MARK: - Properties
     
+    public var didTapBackButton: ControlEvent<Void> {
+        return backButton.rx.tap
+    }
+    
     // MARK: - Live cycle
     
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
+    public init(_ type: NavigationType) {
+        super.init(frame: .zero)
+        setupBackButtonImage(type)
+        
         addSubviews()
         setupLayoutConstraints()
     }
-    
+      
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupBackButtonImage(_ type: NavigationType) {
+        switch type {
+        case .nonButton:
+            backButton.isHidden = true
+        case .dismissButton:
+            backButton.isHidden = false
+            backButton.setImage(
+                UIImage(systemName: "xmark"),
+                for: .normal
+            )
+        case .popButton:
+            backButton.isHidden = false
+            backButton.setImage(
+                UIImage(systemName: "chevron.left"),
+                for: .normal
+            )
+        }
     }
     
 }
@@ -66,7 +98,7 @@ extension NavigationBar {
     
     private func setupLayoutConstraints() {
         snp.makeConstraints {
-            $0.height.equalTo(80)
+            $0.height.equalTo(44)
         }
         
         backButton.snp.makeConstraints {
