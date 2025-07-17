@@ -23,18 +23,26 @@ extension UIFont {
         case bold
     }
     
-    private static func f1Bold(size: CGFloat) -> UIFont {
+    private static var fontsRegistered = false
+    
+    private static func registerFontsOnce() {
+        guard !fontsRegistered else { return }
         BasePresentationFontFamily.registerAllCustomFonts()
+        fontsRegistered = true
+    }
+    
+    private static func f1Bold(size: CGFloat) -> UIFont {
+        registerFontsOnce()
         return BasePresentationFontFamily.Formula1.displayBold.font(size: size)
     }
     
     private static func f1Regular(size: CGFloat) -> UIFont {
-        BasePresentationFontFamily.registerAllCustomFonts()
+        registerFontsOnce()
         return BasePresentationFontFamily.Formula1.displayRegular.font(size: size)
     }
     
     private static func f1Wide(size: CGFloat) -> UIFont {
-        BasePresentationFontFamily.registerAllCustomFonts()
+        registerFontsOnce()
         return BasePresentationFontFamily.Formula1.displayWide.font(size: size)
     }
     

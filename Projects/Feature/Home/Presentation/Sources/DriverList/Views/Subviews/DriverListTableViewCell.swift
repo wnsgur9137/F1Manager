@@ -49,6 +49,9 @@ final class DriverListTableViewCell: UITableViewCell {
         label.backgroundColor = .black
         label.layer.cornerRadius = 10
         label.clipsToBounds = true
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.8
         return label
     }()
     
@@ -143,6 +146,9 @@ final class DriverListTableViewCell: UITableViewCell {
             driverNumberLabel.text = driverNumber
         }
         
+        // 텍스트 설정 후 padding 추가
+        updateDriverNumberLabelPadding()
+        
         // 이름
         fullNameLabel.text = driver.fullName
         teamNameLabel.text = driver.teamName
@@ -175,6 +181,19 @@ final class DriverListTableViewCell: UITableViewCell {
                 self?.headshotImageView.image = image
             }
         }.resume()
+    }
+    
+    private func updateDriverNumberLabelPadding() {
+        driverNumberLabel.setNeedsLayout()
+        driverNumberLabel.layoutIfNeeded()
+        
+        // 텍스트 너비에 따라 패딩 추가
+        let textSize = driverNumberLabel.intrinsicContentSize
+        let paddingHorizontal: CGFloat = 6
+        
+        driverNumberLabel.snp.updateConstraints {
+            $0.width.greaterThanOrEqualTo(max(20, textSize.width + paddingHorizontal))
+        }
     }
 }
 
@@ -229,7 +248,8 @@ extension DriverListTableViewCell {
         
         driverNumberLabel.snp.makeConstraints {
             $0.top.trailing.equalToSuperview().inset(12)
-            $0.width.height.equalTo(20)
+            $0.height.equalTo(20)
+            $0.width.greaterThanOrEqualTo(20)
         }
         
         nameStackView.snp.makeConstraints {

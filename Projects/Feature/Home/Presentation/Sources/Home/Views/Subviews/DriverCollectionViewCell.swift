@@ -43,12 +43,15 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     
     private let driverNumberLabel: UILabel = {
         let label = UILabel()
-        label.font = .f1(.bold, size: 18)
+        label.font = .f1(.bold, size: 16)
         label.textColor = .white
         label.textAlignment = .center
         label.backgroundColor = .black
         label.layer.cornerRadius = 12
         label.clipsToBounds = true
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.8
         return label
     }()
     
@@ -113,7 +116,12 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     // MARK: - Configuration
     
     func configure(with driver: DriverModel) {
-        driverNumberLabel.text = "\(driver.driverNumber)"
+        if let driverNumber = driver.driverNumber {
+            driverNumberLabel.text = driverNumber
+        }
+        
+        // 텍스트 설정 후 padding 추가
+        updateDriverNumberLabelPadding()
         firstNameLabel.text = driver.givenName
         lastNameLabel.text = driver.familyName
         teamNameLabel.text = driver.teamName
@@ -145,6 +153,19 @@ final class DriverCollectionViewCell: UICollectionViewCell {
                 self?.headshotImageView.image = image
             }
         }.resume()
+    }
+    
+    private func updateDriverNumberLabelPadding() {
+        driverNumberLabel.setNeedsLayout()
+        driverNumberLabel.layoutIfNeeded()
+        
+        // 텍스트 너비에 따라 패딩 추가
+        let textSize = driverNumberLabel.intrinsicContentSize
+        let paddingHorizontal: CGFloat = 8
+        
+        driverNumberLabel.snp.updateConstraints {
+            $0.width.greaterThanOrEqualTo(max(24, textSize.width + paddingHorizontal))
+        }
     }
 }
 
@@ -190,7 +211,8 @@ extension DriverCollectionViewCell {
         
         driverNumberLabel.snp.makeConstraints {
             $0.top.trailing.equalToSuperview().inset(8)
-            $0.width.height.equalTo(24)
+            $0.height.equalTo(24)
+            $0.width.greaterThanOrEqualTo(24)
         }
         
         countryFlagLabel.snp.makeConstraints {
