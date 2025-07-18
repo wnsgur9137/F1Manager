@@ -37,6 +37,7 @@ public final class DefaultDriverUseCase: DriverUseCase {
         return driverEntities
             .map { $0.map { $0.toModel() } }
             .catch { error in
+                print("🚨error: \(error)")
                 return .error(self.handle(error))
             }
     }

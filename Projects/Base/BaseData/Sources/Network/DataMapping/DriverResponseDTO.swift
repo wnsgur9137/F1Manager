@@ -33,7 +33,22 @@ struct DriverResponseDTO: Decodable {
 }
 
 extension DriverResponseDTO {
-    func toDomain(driverDetail: DriverDetailResponseDTO?) -> Driver {
+    func toDomain(
+        driverDetail: DriverDetailResponseDTO?,
+        driverStanding: DriverStandingResponseDTO?
+    ) -> Driver {
+        let standingPosition: Int?
+        let standingPoints: Int?
+        let wins: Int?
+        if let driverStanding = driverStanding {
+            standingPosition = Int(driverStanding.position)
+            standingPoints = Int(driverStanding.points)
+            wins = Int(driverStanding.wins)
+        } else {
+            standingPosition = nil
+            standingPoints = nil
+            wins = nil
+        }
         return Driver(
             driverId: driverId,
             driverNumber: driverNumber,
@@ -46,7 +61,10 @@ extension DriverResponseDTO {
             country: country,
             headshotImageURL: driverDetail?.headshotImageURL,
             teamName: driverDetail?.teamName,
-            teamColour: driverDetail?.teamColour
+            teamColour: driverDetail?.teamColour,
+            standingPosition: standingPosition,
+            standingPoints: standingPoints,
+            wins: wins
         )
     }
 }

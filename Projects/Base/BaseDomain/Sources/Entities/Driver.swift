@@ -24,6 +24,9 @@ public struct Driver {
     public let headshotImageURL: String?
     public let teamName: String?
     public let teamColour: String?
+    public let standingPosition: Int?
+    public let standingPoints: Int?
+    public let wins: Int?
     
     public init(
         driverId: String,
@@ -37,7 +40,10 @@ public struct Driver {
         country: String?,
         headshotImageURL: String?,
         teamName: String?,
-        teamColour: String?
+        teamColour: String?,
+        standingPosition: Int?,
+        standingPoints: Int?,
+        wins: Int?
     ) {
         self.driverId = driverId
         self.driverNumber = driverNumber
@@ -52,6 +58,9 @@ public struct Driver {
         self.headshotImageURL = headshotImageURL
         self.teamName = teamName
         self.teamColour = teamColour
+        self.standingPosition = standingPosition
+        self.standingPoints = standingPoints
+        self.wins = wins
     }
 }
 
@@ -70,7 +79,10 @@ extension Driver {
             country: country,
             headshotImageURL: headshotImageURL,
             teamName: teamName,
-            teamColour: teamColour
+            teamColour: teamColour,
+            standingPosition: standingPosition,
+            standingPoints: standingPoints,
+            wins: wins
         )
     }
 }

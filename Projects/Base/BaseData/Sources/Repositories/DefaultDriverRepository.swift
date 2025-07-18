@@ -48,33 +48,36 @@ extension DefaultDriverRepository {
     public func getDrivers(year: Int) -> Single<[Driver]> {
         return Single.zip(
             networkManager.getDrivers(year: year),
+            networkManager.getDriverStandings(year: year),
             getLatestDriverDetails()
         )
-        .map { (driverDTOs, driverDetailDTOs) -> [Driver] in
+        .map { (driverDTOs, driverStandingDTOs, driverDetailDTOs) -> [Driver] in
             guard !driverDTOs.isEmpty else {
                 return []
             }
             
             let drivers: [Driver] = driverDTOs.compactMap { driverDTO in
-                guard let driverNumberString = driverDTO.driverNumber,
-                      let driverNumber = Int(driverNumberString) else {
-                    return driverDTO.toDomain(driverDetail: nil)
-                }
                 
-                // 드라이버 번호가 일치하는 첫 번째 DetailDTO 찾기
-                let matchingDetail = driverDetailDTOs.first { detailDTO in
-                    if driverNumber == 33 { // api에서는 1번을 사용하지 않음 (예시 2025 Max verstappen -> 33)
-                        return detailDTO.driverNumber == 1
-                        || driverNumber == detailDTO.driverNumber
+                var driverDetail: DriverDetailResponseDTO?
+                if let driverNumberString = driverDTO.driverNumber,
+                   let driverNumber = Int(driverNumberString) {
+                    driverDetail = driverDetailDTOs.first { detailDTO in
+                        if driverNumber == 33 { // api에서는 1번을 사용하지 않음 (예시 2025 Max verstappen -> 33)
+                            return detailDTO.driverNumber == 1
+                            || driverNumber == detailDTO.driverNumber
+                        }
+                        return driverNumber == detailDTO.driverNumber
                     }
-                    return driverNumber == detailDTO.driverNumber
                 }
                 
-                if let matchingDetail = matchingDetail {
-                    return driverDTO.toDomain(driverDetail: matchingDetail)
-                } else {
-                    return driverDTO.toDomain(driverDetail: nil)
+                let driverStanding = driverStandingDTOs.first { standingDTO in
+                    driverDTO.driverId == standingDTO.driver.driverId
                 }
+                
+                return driverDTO.toDomain(
+                    driverDetail: driverDetail,
+                    driverStanding: driverStanding
+                )
             }
             
             return drivers
