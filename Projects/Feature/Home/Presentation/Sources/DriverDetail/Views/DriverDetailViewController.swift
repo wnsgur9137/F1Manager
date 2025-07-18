@@ -135,6 +135,58 @@ public final class DriverDetailViewController: UIViewController, View {
         return card
     }()
     
+    private let standingInfoCard: DriverInfoCardView = {
+        let card = DriverInfoCardView()
+        card.configure(title: "2025 Championship Standing")
+        return card
+    }()
+    
+    // Championship Stats Section
+    private let statsSection: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBackground
+        view.layer.cornerRadius = 12
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.1
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
+        view.layer.shadowRadius = 4
+        return view
+    }()
+    
+    private let statsSectionTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Championship Stats"
+        label.font = .f1(.bold, size: 20)
+        label.textColor = .label
+        return label
+    }()
+    
+    private let statsStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.distribution = .fillEqually
+        stackView.spacing = 1
+        return stackView
+    }()
+    
+    private let positionStatView: StatCardView = {
+        let view = StatCardView()
+        view.configure(title: "Position", value: "-", style: .position)
+        return view
+    }()
+    
+    private let pointsStatView: StatCardView = {
+        let view = StatCardView()
+        view.configure(title: "Points", value: "-", style: .points)
+        return view
+    }()
+    
+    private let winsStatView: StatCardView = {
+        let view = StatCardView()
+        view.configure(title: "Wins", value: "-", style: .wins)
+        return view
+    }()
+    
     // MARK: - Properties
     
     public var disposeBag = DisposeBag()
@@ -253,8 +305,59 @@ extension DriverDetailViewController {
         }
         
         // Configure Info Cards
+        configureStandingInfoCard(with: driver)
         configurePersonalInfoCard(with: driver)
         configureCareerInfoCard(with: driver)
+        
+        // Configure Stats
+        configureStatsSection(with: driver)
+    }
+    
+    private func configureStandingInfoCard(with driver: DriverModel) {
+        var infoItems: [DriverInfoCardView.InfoItem] = []
+        
+        if let standingPosition = driver.standingPosition {
+            let positionText = standingPosition == 1 ? "1st" : standingPosition == 2 ? "2nd" : standingPosition == 3 ? "3rd" : "\(standingPosition)th"
+            infoItems.append(DriverInfoCardView.InfoItem(
+                title: "Championship Position",
+                value: positionText
+            ))
+        }
+        
+        if let standingPoints = driver.standingPoints {
+            infoItems.append(DriverInfoCardView.InfoItem(
+                title: "Total Points",
+                value: "\(standingPoints) pts"
+            ))
+        }
+        
+        if let wins = driver.wins {
+            let winsText = wins == 1 ? "1 win" : "\(wins) wins"
+            infoItems.append(DriverInfoCardView.InfoItem(
+                title: "Race Wins",
+                value: winsText
+            ))
+        }
+        
+        standingInfoCard.configure(items: infoItems)
+    }
+    
+    private func configureStatsSection(with driver: DriverModel) {
+        // Position
+        if let standingPosition = driver.standingPosition {
+            let positionText = standingPosition == 1 ? "1st" : standingPosition == 2 ? "2nd" : standingPosition == 3 ? "3rd" : "\(standingPosition)th"
+            positionStatView.configure(title: "Position", value: positionText, style: .position)
+        }
+        
+        // Points
+        if let standingPoints = driver.standingPoints {
+            pointsStatView.configure(title: "Points", value: "\(standingPoints)", style: .points)
+        }
+        
+        // Wins
+        if let wins = driver.wins {
+            winsStatView.configure(title: "Wins", value: "\(wins)", style: .wins)
+        }
     }
     
     private func configurePersonalInfoCard(with driver: DriverModel) {
@@ -368,8 +471,18 @@ extension DriverDetailViewController {
         countryInfoView.addSubview(countryFlagLabel)
         countryInfoView.addSubview(countryNameLabel)
         
+        // Stats Section
+        contentView.addSubview(statsSection)
+        statsSection.addSubview(statsSectionTitleLabel)
+        statsSection.addSubview(statsStackView)
+        
+        statsStackView.addArrangedSubview(positionStatView)
+        statsStackView.addArrangedSubview(pointsStatView)
+        statsStackView.addArrangedSubview(winsStatView)
+        
         // Info Cards
         contentView.addSubview(infoCardsStackView)
+        infoCardsStackView.addArrangedSubview(standingInfoCard)
         infoCardsStackView.addArrangedSubview(personalInfoCard)
         infoCardsStackView.addArrangedSubview(careerInfoCard)
     }
@@ -439,9 +552,25 @@ extension DriverDetailViewController {
             $0.trailing.lessThanOrEqualToSuperview()
         }
         
+        // Stats Section
+        statsSection.snp.makeConstraints {
+            $0.top.equalTo(heroSectionView.snp.bottom).offset(24)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(120)
+        }
+        
+        statsSectionTitleLabel.snp.makeConstraints {
+            $0.top.leading.equalToSuperview().inset(16)
+        }
+        
+        statsStackView.snp.makeConstraints {
+            $0.top.equalTo(statsSectionTitleLabel.snp.bottom).offset(12)
+            $0.horizontalEdges.bottom.equalToSuperview().inset(16)
+        }
+        
         // Info Cards
         infoCardsStackView.snp.makeConstraints {
-            $0.top.equalTo(heroSectionView.snp.bottom).offset(24)
+            $0.top.equalTo(statsSection.snp.bottom).offset(24)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(24)
         }
