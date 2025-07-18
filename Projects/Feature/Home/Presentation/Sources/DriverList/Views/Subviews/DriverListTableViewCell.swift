@@ -180,7 +180,7 @@ final class DriverListTableViewCell: UITableViewCell {
         // Standing 정보
         if let standingPosition = driver.standingPosition {
             positionLabel.text = "\(standingPosition)"
-            positionLabel.textColor = .systemBackground
+            positionLabel.textColor = .white
             
             // 포지션에 따른 배지 색상
             switch standingPosition {

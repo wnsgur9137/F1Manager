@@ -90,6 +90,21 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    private let positionBadge: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemRed
+        view.layer.cornerRadius = 12
+        return view
+    }()
+    
+    private let positionLabel: UILabel = {
+        let label = UILabel()
+        label.font = .f1(.bold, size: 14)
+        label.textColor = .white
+        label.textAlignment = .center
+        return label
+    }()
+    
     // MARK: - Initialization
     
     override init(frame: CGRect) {
@@ -110,7 +125,10 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         lastNameLabel.text = nil
         teamNameLabel.text = nil
         countryFlagLabel.text = nil
+        positionLabel.text = nil
         teamColorView.backgroundColor = .clear
+        positionBadge.backgroundColor = .systemGray
+        positionBadge.isHidden = true
     }
     
     // MARK: - Configuration
@@ -135,6 +153,28 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         // 국가 코드를 플래그 이모지로 변환
         if let countryCode = driver.countryCode {
             countryFlagLabel.text = countryCode.flag
+        }
+        
+        // Standing Position 표시
+        if let standingPosition = driver.standingPosition {
+            positionLabel.text = "\(standingPosition)"
+            positionLabel.textColor = .white
+            positionBadge.isHidden = false
+            
+            // 포지션에 따른 배지 색상
+            switch standingPosition {
+            case 1:
+                positionBadge.backgroundColor = .systemYellow // Gold
+            case 2:
+                positionBadge.backgroundColor = .systemGray2 // Silver
+            case 3:
+                positionBadge.backgroundColor = .systemOrange // Bronze
+            default:
+                positionBadge.backgroundColor = .white // Default white
+                positionLabel.textColor = .black
+            }
+        } else {
+            positionBadge.isHidden = true
         }
         
         // 헤드샷 이미지 로딩 (나중에 Kingfisher 등으로 대체)
@@ -180,10 +220,13 @@ extension DriverCollectionViewCell {
             driverNumberLabel,
             nameStackView,
             teamNameLabel,
-            countryFlagLabel
+            countryFlagLabel,
+            positionBadge
         ].forEach {
             containerView.addSubview($0)
         }
+        
+        positionBadge.addSubview(positionLabel)
         
         [
             firstNameLabel,
@@ -230,6 +273,16 @@ extension DriverCollectionViewCell {
             $0.top.equalTo(nameStackView.snp.bottom).offset(4)
             $0.leading.trailing.equalToSuperview().inset(12)
             $0.bottom.equalToSuperview().inset(12)
+        }
+        
+        positionBadge.snp.makeConstraints {
+            $0.bottom.equalTo(headshotImageView.snp.bottom).inset(8)
+            $0.trailing.equalToSuperview().inset(8)
+            $0.width.height.equalTo(24)
+        }
+        
+        positionLabel.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
     }
 }
