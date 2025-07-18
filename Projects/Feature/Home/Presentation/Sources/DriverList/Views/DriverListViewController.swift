@@ -100,6 +100,15 @@ extension DriverListViewController {
     private func bindState(_ reactor: DriverListReactor) {
         reactor.pulse(\.$drivers)
             .compactMap { $0 }
+            .map { drivers in
+                return drivers.sorted { (first, second) in
+                    guard let firstPosition = first.standingPosition,
+                          let secondPosition = second.standingPosition else {
+                        return false
+                    }
+                    return firstPosition < secondPosition
+                }
+            }
             .bind(onNext: { [weak self] drivers in
                 self?.drivers = drivers
                 self?.driversTableView.reloadData()

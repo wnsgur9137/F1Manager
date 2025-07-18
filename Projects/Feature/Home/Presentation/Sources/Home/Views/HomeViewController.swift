@@ -119,7 +119,17 @@ extension HomeViewController {
     private func bindState(_ reactor: HomeReactor) {
         reactor.pulse(\.$drivers)
             .compactMap { $0 }
-            .map { return Array($0.prefix(4)) }
+            .map { drivers in
+                return Array(drivers
+                    .sorted { (first, second) in
+                        guard let firstPosition = first.standingPosition,
+                              let secondPosition = second.standingPosition else {
+                            return false
+                        }
+                        return firstPosition < secondPosition
+                    }
+                    .prefix(5))
+            }
             .bind(onNext: { [weak self] drivers in
                 self?.drivers = drivers
                 self?.driversCollectionView.reloadData()
