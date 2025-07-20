@@ -18,9 +18,7 @@ extension NetworkManager {
             .getDrivers(year: year),
             type: DriversResponseDTO.self
         )
-        .map {
-            return $0.drivers
-        }
+        .map { $0.drivers }
     }
     
     func getDriverDetail(driverNumber: Int) -> Single<DriverDetailResponseDTO> {
@@ -41,5 +39,13 @@ extension NetworkManager {
             .getLatestDriverDetails,
             type: [DriverDetailResponseDTO].self
         )
+    }
+    
+    func getDriverStandings(year: Int) -> Single<[DriverStandingResponseDTO]> {
+        return request(
+            .getDriverStandings(year: year),
+            type: DriverStandingsTableResponseDTO.self
+        )
+        .map { $0.driverStandings }
     }
 }

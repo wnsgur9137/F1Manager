@@ -13,9 +13,14 @@ import BasePresentation
 
 public struct HomeFlowAction {
     let navigateToDriverList: () -> Void
+    let driverSelected: (DriverModel) -> Void
     
-    public init(navigateToDriverList: @escaping () -> Void) {
+    public init(
+        navigateToDriverList: @escaping () -> Void,
+        driverSelected: @escaping (DriverModel) -> Void
+    ) {
         self.navigateToDriverList = navigateToDriverList
+        self.driverSelected = driverSelected
     }
 }
 
@@ -28,6 +33,7 @@ public final class HomeReactor: Reactor {
     public enum Action {
         case viewDidLoad
         case navigateToDriverList
+        case driverSelected(DriverModel)
     }
     
     public enum Mutation {
@@ -72,6 +78,10 @@ extension HomeReactor {
             
         case .navigateToDriverList:
             flowAction.navigateToDriverList()
+            return .empty()
+            
+        case let .driverSelected(driver):
+            flowAction.driverSelected(driver)
             return .empty()
         }
     }

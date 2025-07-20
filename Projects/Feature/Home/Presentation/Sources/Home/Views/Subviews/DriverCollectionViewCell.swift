@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 import BasePresentation
 
@@ -17,7 +18,7 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     
     private let containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .cellBackground
         view.layer.cornerRadius = 12
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 2)
@@ -28,7 +29,7 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     
     private let headshotImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 8
         imageView.backgroundColor = .systemGray5
@@ -90,6 +91,21 @@ final class DriverCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    private let positionBadge: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemRed
+        view.layer.cornerRadius = 12
+        return view
+    }()
+    
+    private let positionLabel: UILabel = {
+        let label = UILabel()
+        label.font = .f1(.bold, size: 14)
+        label.textColor = .white
+        label.textAlignment = .center
+        return label
+    }()
+    
     // MARK: - Initialization
     
     override init(frame: CGRect) {
@@ -104,13 +120,17 @@ final class DriverCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        headshotImageView.kf.cancelDownloadTask()
         headshotImageView.image = nil
         driverNumberLabel.text = nil
         firstNameLabel.text = nil
         lastNameLabel.text = nil
         teamNameLabel.text = nil
         countryFlagLabel.text = nil
+        positionLabel.text = nil
         teamColorView.backgroundColor = .clear
+        positionBadge.backgroundColor = .systemGray
+        positionBadge.isHidden = true
     }
     
     // MARK: - Configuration
@@ -137,22 +157,33 @@ final class DriverCollectionViewCell: UICollectionViewCell {
             countryFlagLabel.text = countryCode.flag
         }
         
-        // 헤드샷 이미지 로딩 (나중에 Kingfisher 등으로 대체)
-        if let headshotImageURL = driver.headshotImageURL {
-            loadHeadshotImage(from: headshotImageURL)
-        }
-    }
-    
-    private func loadHeadshotImage(from urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-        
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data = data, let image = UIImage(data: data) else { return }
+        // Standing Position 표시
+        if let standingPosition = driver.standingPosition {
+            positionLabel.text = "\(standingPosition)"
+            positionLabel.textColor = .white
+            positionBadge.isHidden = false
             
-            DispatchQueue.main.async {
-                self?.headshotImageView.image = image
+            // 포지션에 따른 배지 색상
+            switch standingPosition {
+            case 1:
+                positionBadge.backgroundColor = .systemYellow // Gold
+            case 2:
+                positionBadge.backgroundColor = .systemGray2 // Silver
+            case 3:
+                positionBadge.backgroundColor = .systemOrange // Bronze
+            default:
+                positionBadge.backgroundColor = .white // Default white
+                positionLabel.textColor = .black
             }
-        }.resume()
+        } else {
+            positionBadge.isHidden = true
+        }
+        
+        // 헤드샷 이미지
+        headshotImageView.setImage(
+            driver.headshotImageURL,
+            placeholder: UIImage(systemName: "person.circle.fill")
+        )
     }
     
     private func updateDriverNumberLabelPadding() {
@@ -180,10 +211,13 @@ extension DriverCollectionViewCell {
             driverNumberLabel,
             nameStackView,
             teamNameLabel,
-            countryFlagLabel
+            countryFlagLabel,
+            positionBadge
         ].forEach {
             containerView.addSubview($0)
         }
+        
+        positionBadge.addSubview(positionLabel)
         
         [
             firstNameLabel,
@@ -200,7 +234,7 @@ extension DriverCollectionViewCell {
         
         headshotImageView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview().inset(12)
-            $0.height.equalTo(80)
+            $0.height.equalTo(100)
         }
         
         teamColorView.snp.makeConstraints {
@@ -230,6 +264,16 @@ extension DriverCollectionViewCell {
             $0.top.equalTo(nameStackView.snp.bottom).offset(4)
             $0.leading.trailing.equalToSuperview().inset(12)
             $0.bottom.equalToSuperview().inset(12)
+        }
+        
+        positionBadge.snp.makeConstraints {
+            $0.bottom.equalTo(headshotImageView.snp.bottom).inset(8)
+            $0.trailing.equalToSuperview().inset(8)
+            $0.width.height.equalTo(24)
+        }
+        
+        positionLabel.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
     }
 }

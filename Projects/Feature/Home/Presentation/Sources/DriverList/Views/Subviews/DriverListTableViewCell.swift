@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 import BasePresentation
 
@@ -17,7 +18,7 @@ final class DriverListTableViewCell: UITableViewCell {
     
     private let containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .cellBackground
         view.layer.cornerRadius = 12
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 1)
@@ -77,24 +78,41 @@ final class DriverListTableViewCell: UITableViewCell {
         return label
     }()
     
-    private let countryInfoStackView: UIStackView = {
+    private let standingInfoStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 6
+        stackView.spacing = 8
         stackView.alignment = .center
         return stackView
     }()
     
-    private let countryFlagLabel: UILabel = {
+    private let positionBadge: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemRed
+        view.layer.cornerRadius = 10
+        return view
+    }()
+    
+    private let positionLabel: UILabel = {
         let label = UILabel()
-        label.font = .f1(.regular, size: 18)
+        label.font = .f1(.bold, size: 12)
+        label.textColor = .white
+        label.textAlignment = .center
         return label
     }()
     
-    private let countryLabel: UILabel = {
+    private let pointsLabel: UILabel = {
         let label = UILabel()
-        label.font = .f1(.regular, size: 12)
-        label.textColor = .tertiaryLabel
+        label.font = .f1(.bold, size: 14)
+        label.textColor = .label
+        return label
+    }()
+    
+    private let pointsUnitLabel: UILabel = {
+        let label = UILabel()
+        label.text = "PTS"
+        label.font = .f1(.regular, size: 10)
+        label.textColor = .secondaryLabel
         return label
     }()
     
@@ -122,13 +140,15 @@ final class DriverListTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        headshotImageView.kf.cancelDownloadTask()
         headshotImageView.image = nil
         driverNumberLabel.text = nil
         fullNameLabel.text = nil
         teamNameLabel.text = nil
-        countryFlagLabel.text = nil
-        countryLabel.text = nil
+        positionLabel.text = nil
+        pointsLabel.text = nil
         teamColorView.backgroundColor = .clear
+        positionBadge.backgroundColor = .systemGray
     }
     
     // MARK: - Setup
@@ -159,28 +179,34 @@ final class DriverListTableViewCell: UITableViewCell {
             teamColorView.backgroundColor = color
         }
         
-        // 국가 정보
-        if let countryCode = driver.countryCode {
-            countryFlagLabel.text = countryCode.flag
+        // Standing 정보
+        if let standingPosition = driver.standingPosition {
+            positionLabel.text = "\(standingPosition)"
+            positionLabel.textColor = .white
+            
+            // 포지션에 따른 배지 색상
+            switch standingPosition {
+            case 1:
+                positionBadge.backgroundColor = .systemYellow // Gold
+            case 2:
+                positionBadge.backgroundColor = .systemGray // Silver
+            case 3:
+                positionBadge.backgroundColor = .systemOrange // Bronze
+            default:
+                positionBadge.backgroundColor = .clear // Default clear
+                positionLabel.textColor = .label
+            }
         }
-        countryLabel.text = driver.country
+        
+        if let standingPoints = driver.standingPoints {
+            pointsLabel.text = "\(standingPoints)"
+        }
         
         // 헤드샷 이미지
-        if let headshotImageURL = driver.headshotImageURL {
-            loadHeadshotImage(from: headshotImageURL)
-        }
-    }
-    
-    private func loadHeadshotImage(from urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-        
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data = data, let image = UIImage(data: data) else { return }
-            
-            DispatchQueue.main.async {
-                self?.headshotImageView.image = image
-            }
-        }.resume()
+        headshotImageView.setImage(
+            driver.headshotImageURL,
+            placeholder: UIImage(systemName: "person.circle.fill")
+        )
     }
     
     private func updateDriverNumberLabelPadding() {
@@ -207,7 +233,7 @@ extension DriverListTableViewCell {
             teamColorView,
             driverNumberLabel,
             nameStackView,
-            countryInfoStackView,
+            standingInfoStackView,
             chevronImageView
         ].forEach {
             containerView.addSubview($0)
@@ -220,23 +246,26 @@ extension DriverListTableViewCell {
             nameStackView.addArrangedSubview($0)
         }
         
+        positionBadge.addSubview(positionLabel)
+        
         [
-            countryFlagLabel,
-            countryLabel
+            positionBadge,
+            pointsLabel,
+            pointsUnitLabel
         ].forEach {
-            countryInfoStackView.addArrangedSubview($0)
+            standingInfoStackView.addArrangedSubview($0)
         }
     }
     
     private func setupLayoutConstraints() {
         containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16))
+            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 6, left: 16, bottom: 6, right: 16))
         }
         
         headshotImageView.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(50)
+            $0.width.height.equalTo(60)
         }
         
         teamColorView.snp.makeConstraints {
@@ -247,21 +276,29 @@ extension DriverListTableViewCell {
         }
         
         driverNumberLabel.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(12)
+            $0.top.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(20)
             $0.width.greaterThanOrEqualTo(20)
         }
         
         nameStackView.snp.makeConstraints {
             $0.leading.equalTo(headshotImageView.snp.trailing).offset(12)
-            $0.top.equalToSuperview().inset(12)
+            $0.top.equalToSuperview().inset(16)
             $0.trailing.lessThanOrEqualTo(driverNumberLabel.snp.leading).offset(-8)
         }
         
-        countryInfoStackView.snp.makeConstraints {
+        standingInfoStackView.snp.makeConstraints {
             $0.leading.equalTo(headshotImageView.snp.trailing).offset(12)
-            $0.bottom.equalToSuperview().inset(12)
+            $0.bottom.equalToSuperview().inset(16)
             $0.trailing.lessThanOrEqualTo(chevronImageView.snp.leading).offset(-8)
+        }
+        
+        positionBadge.snp.makeConstraints {
+            $0.width.height.equalTo(20)
+        }
+        
+        positionLabel.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
         
         chevronImageView.snp.makeConstraints {

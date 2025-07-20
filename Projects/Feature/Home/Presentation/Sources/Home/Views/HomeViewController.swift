@@ -119,7 +119,17 @@ extension HomeViewController {
     private func bindState(_ reactor: HomeReactor) {
         reactor.pulse(\.$drivers)
             .compactMap { $0 }
-            .map { return Array($0.prefix(4)) }
+            .map { drivers in
+                return Array(drivers
+                    .sorted { (first, second) in
+                        guard let firstPosition = first.standingPosition,
+                              let secondPosition = second.standingPosition else {
+                            return false
+                        }
+                        return firstPosition < secondPosition
+                    }
+                    .prefix(5))
+            }
             .bind(onNext: { [weak self] drivers in
                 self?.drivers = drivers
                 self?.driversCollectionView.reloadData()
@@ -142,7 +152,10 @@ extension HomeViewController {
         view.addSubview(sectionHeaderView)
         view.addSubview(driversCollectionView)
         
-        [driversLabel, seeAllButton].forEach {
+        [
+            driversLabel,
+            seeAllButton
+        ].forEach {
             sectionHeaderView.addSubview($0)
         }
     }
@@ -172,7 +185,7 @@ extension HomeViewController {
         driversCollectionView.snp.makeConstraints {
             $0.top.equalTo(sectionHeaderView.snp.bottom).offset(16)
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(180)
+            $0.height.equalTo(200)
         }
     }
 }
@@ -197,6 +210,12 @@ extension HomeViewController: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegateFlowLayout
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 140, height: 180)
+        return CGSize(width: 140, height: 200)
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard indexPath.item < drivers.count else { return }
+        let selectedDriver = drivers[indexPath.item]
+        reactor?.action.onNext(.driverSelected(selectedDriver))
     }
 }

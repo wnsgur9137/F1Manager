@@ -100,6 +100,15 @@ extension DriverListViewController {
     private func bindState(_ reactor: DriverListReactor) {
         reactor.pulse(\.$drivers)
             .compactMap { $0 }
+            .map { drivers in
+                return drivers.sorted { (first, second) in
+                    guard let firstPosition = first.standingPosition,
+                          let secondPosition = second.standingPosition else {
+                        return false
+                    }
+                    return firstPosition < secondPosition
+                }
+            }
             .bind(onNext: { [weak self] drivers in
                 self?.drivers = drivers
                 self?.driversTableView.reloadData()
@@ -183,7 +192,7 @@ extension DriverListViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension DriverListViewController: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80
+        return 100
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

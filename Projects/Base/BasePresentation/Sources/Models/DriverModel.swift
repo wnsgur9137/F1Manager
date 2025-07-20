@@ -22,6 +22,9 @@ public struct DriverModel {
     public let headshotImageURL: String?
     public let teamName: String?
     public let teamColour: String?
+    public let standingPosition: Int?
+    public let standingPoints: Int?
+    public let wins: Int?
     
     public init(
         driverId: String,
@@ -36,7 +39,10 @@ public struct DriverModel {
         country: String?,
         headshotImageURL: String?,
         teamName: String?,
-        teamColour: String?
+        teamColour: String?,
+        standingPosition: Int?,
+        standingPoints: Int?,
+        wins: Int?
     ) {
         self.driverId = driverId
         self.driverNumber = driverNumber
@@ -51,5 +57,8 @@ public struct DriverModel {
         self.headshotImageURL = headshotImageURL
         self.teamName = teamName
         self.teamColour = teamColour
+        self.standingPosition = standingPosition
+        self.standingPoints = standingPoints
+        self.wins = wins
     }
 }
