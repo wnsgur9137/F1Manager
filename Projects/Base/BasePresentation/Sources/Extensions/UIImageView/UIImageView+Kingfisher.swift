@@ -19,7 +19,12 @@ extension UIImageView {
     ) -> DownloadTask? {
         guard let imageURLString = imageURLString,
               let imageURL = URL(string: imageURLString) else { return nil }
-        return setImage(imageURL)
+        return setImage(
+            imageURL,
+            placeholder: placeholder,
+            options: options,
+            completionHandler: completionHandler
+        )
     }
     
     @discardableResult
