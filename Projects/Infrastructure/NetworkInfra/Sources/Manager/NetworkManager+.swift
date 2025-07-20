@@ -45,3 +45,21 @@ public extension NetworkManager {
             .map(T.self, using: JSONDecoder())
     }
 }
+
+// MARK: - OpenF1Session
+public extension NetworkManager {
+    func request(_ target: OpenF1SessionTargetType) -> Single<Any> {
+        return openF1SessionProvider
+            .request(target)
+            .mapJSON()
+    }
+    
+    func request<T: Decodable>(
+        _ target: OpenF1SessionTargetType,
+        type: T.Type
+    ) -> Single<T> {
+        return openF1SessionProvider
+            .request(target)
+            .map(T.self, using: JSONDecoder())
+    }
+}
