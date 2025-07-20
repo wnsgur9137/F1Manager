@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 import BasePresentation
 
@@ -139,6 +140,7 @@ final class DriverListTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        headshotImageView.kf.cancelDownloadTask()
         headshotImageView.image = nil
         driverNumberLabel.text = nil
         fullNameLabel.text = nil
@@ -201,21 +203,10 @@ final class DriverListTableViewCell: UITableViewCell {
         }
         
         // 헤드샷 이미지
-        if let headshotImageURL = driver.headshotImageURL {
-            loadHeadshotImage(from: headshotImageURL)
-        }
-    }
-    
-    private func loadHeadshotImage(from urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-        
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data = data, let image = UIImage(data: data) else { return }
-            
-            DispatchQueue.main.async {
-                self?.headshotImageView.image = image
-            }
-        }.resume()
+        headshotImageView.setImage(
+            driver.headshotImageURL,
+            placeholder: UIImage(systemName: "person.circle.fill")
+        )
     }
     
     private func updateDriverNumberLabelPadding() {
