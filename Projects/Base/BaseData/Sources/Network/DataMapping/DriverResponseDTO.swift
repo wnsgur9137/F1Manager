@@ -37,18 +37,9 @@ extension DriverResponseDTO {
         driverDetail: DriverDetailResponseDTO?,
         driverStanding: DriverStandingResponseDTO?
     ) -> Driver {
-        let standingPosition: Int?
-        let standingPoints: Int?
-        let wins: Int?
-        if let driverStanding = driverStanding {
-            standingPosition = Int(driverStanding.position)
-            standingPoints = Int(driverStanding.points)
-            wins = Int(driverStanding.wins)
-        } else {
-            standingPosition = nil
-            standingPoints = nil
-            wins = nil
-        }
+        let standingPosition = driverStanding.flatMap { Int($0.position) }
+        let standingPoints = driverStanding.flatMap { Int($0.points) }
+        let wins = driverStanding.flatMap { Int($0.wins) }
         return Driver(
             driverId: driverId,
             driverNumber: driverNumber,

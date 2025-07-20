@@ -53,11 +53,7 @@ struct DriverStandingsTableResponseDTO: Decodable {
         let standingsListsArray = try standingsTable.decode([StandingsList].self, forKey: .StandingsLists)
         
         // StandingsLists 배열의 첫 번째 요소에서 DriverStandings 추출
-        if let firstStandingsList = standingsListsArray.first {
-            self.driverStandings = firstStandingsList.driverStandings
-        } else {
-            self.driverStandings = []
-        }
+        self.driverStandings = standingsListsArray.first?.driverStandings ?? []
     }
 }
 
