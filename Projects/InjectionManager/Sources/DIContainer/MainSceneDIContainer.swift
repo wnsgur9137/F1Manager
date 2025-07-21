@@ -11,6 +11,7 @@ import UIKit
 import NetworkInfra
 import Features
 import Home
+import Splash
 
 public final class MainSceneDIContainer {
     
@@ -45,6 +46,19 @@ public final class MainSceneDIContainer {
             rootNavigtaionController: rootNavigtaionController,
             tabBarController: tabBarController,
             homeDIContainer: makeHomeDIContainer()
+        )
+    }
+    
+    private func makeSplashDIContainer() -> SplashDIContainer {
+        let dependencies = SplashDIContainer.Dependencies(
+            networkManager: dependencies.networkManager
+        )
+        return SplashDIContainer(dependencies: dependencies)
+    }
+    
+    public func makeSplashCoordinator() -> SplashCoordinator {
+        return DefaultSplashCoordinator(
+            dependencies: makeSplashDIContainer()
         )
     }
 }
