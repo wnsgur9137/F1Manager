@@ -26,7 +26,7 @@ public protocol SplashCoordinator: Coordinator {
 public final class DefaultSplashCoordinator: SplashCoordinator {
     
     public var finishDelegate: CoordinatorFinishDelegate?
-    public var navigationController: UINavigationController?
+    public weak var navigationController: UINavigationController?
     public var childCoordinators: [Coordinator] = []
     public var type: CoordinatorType { .splash }
     

@@ -41,6 +41,7 @@ public final class SplashReactor: Reactor {
     public var initialState = State()
     private let flowAction: SplashFlowAction
     private let disposeBag = DisposeBag()
+    private let splashDuration: DispatchTimeInterval = .milliseconds(1500) // 스플래시 노출 시간
     
     public init(flowAction: SplashFlowAction) {
         self.flowAction = flowAction
@@ -59,7 +60,7 @@ extension SplashReactor {
         switch action {
         case .viewDidLoad:
             return Observable.just(.showMainView)
-                .delay(.milliseconds(1500), scheduler: MainScheduler.instance) // 스플래시 노출 시간
+                .delay(splashDuration, scheduler: MainScheduler.instance)
         }
     }
     

@@ -15,7 +15,7 @@ import Splash
 
 public final class MainSceneDIContainer {
     
-    private let rootNavigtaionController: UINavigationController
+    private let rootNavigationController: UINavigationController
     private let tabBarController: UITabBarController
     
     struct Dependencies {
@@ -29,7 +29,7 @@ public final class MainSceneDIContainer {
         tabBarController: UITabBarController,
         dependencies: Dependencies
     ) {
-        self.rootNavigtaionController = rootNavigationController
+        self.rootNavigationController = rootNavigationController
         self.tabBarController = tabBarController
         self.dependencies = dependencies
     }
@@ -43,7 +43,7 @@ public final class MainSceneDIContainer {
     
     public func makeTabBarCoordinator() -> TabBarCoordinator {
         return DefaultTabBarCoordinator(
-            rootNavigtaionController: rootNavigtaionController,
+            rootNavigationController: rootNavigationController,
             tabBarController: tabBarController,
             homeDIContainer: makeHomeDIContainer()
         )
@@ -60,7 +60,7 @@ public final class MainSceneDIContainer {
         return DefaultSplashCoordinator(
             appFlowDependencies: self,
             dependencies: makeSplashDIContainer(),
-            navigationController: rootNavigtaionController
+            navigationController: rootNavigationController
         )
     }
 }
