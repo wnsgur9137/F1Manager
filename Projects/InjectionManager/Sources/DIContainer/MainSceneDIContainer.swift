@@ -58,7 +58,16 @@ public final class MainSceneDIContainer {
     
     public func makeSplashCoordinator() -> SplashCoordinator {
         return DefaultSplashCoordinator(
-            dependencies: makeSplashDIContainer()
+            appFlowDependencies: self,
+            dependencies: makeSplashDIContainer(),
+            navigationController: rootNavigtaionController
         )
+    }
+}
+
+extension MainSceneDIContainer: AppFlowDependencies {
+    public func showMainFlow() {
+        let tabBarCoordinator = makeTabBarCoordinator()
+        tabBarCoordinator.start()
     }
 }

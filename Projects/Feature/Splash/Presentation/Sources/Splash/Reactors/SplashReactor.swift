@@ -8,13 +8,15 @@
 
 import Foundation
 import ReactorKit
+import RxSwift
 
 import BasePresentation
 
 public struct SplashFlowAction {
+    let showMainView: () -> Void
     
-    public init() {
-        
+    public init(showMainView: @escaping () -> Void) {
+        self.showMainView = showMainView
     }
 }
 
@@ -25,11 +27,11 @@ enum SplashError: Error {
 public final class SplashReactor: Reactor {
     
     public enum Action {
-        
+        case viewDidLoad
     }
     
     public enum Mutation {
-        
+        case showMainView
     }
     
     public struct State {
@@ -55,7 +57,9 @@ public final class SplashReactor: Reactor {
 extension SplashReactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-            
+        case .viewDidLoad:
+            return Observable.just(.showMainView)
+                .delay(.milliseconds(1500), scheduler: MainScheduler.instance) // 스플래시 노출 시간
         }
     }
     
@@ -65,7 +69,8 @@ extension SplashReactor {
     ) -> State {
         var state = state
         switch mutation {
-            
+        case .showMainView:
+            flowAction.showMainView()
         }
         return state
     }

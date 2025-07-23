@@ -11,6 +11,7 @@ import ReactorKit
 import RxSwift
 import RxCocoa
 import SnapKit
+import Lottie
 
 import BasePresentation
 
@@ -18,11 +19,19 @@ public final class SplashViewController: UIViewController, View {
     
     // MARK: - UI Components
     
+    private let lottieAnimationView: LottieAnimationView = {
+        let lottieView = LottieAnimationView(name: .splash)
+        lottieView.loopMode = .loop
+        lottieView.alpha = 0.3
+        lottieView.animationSpeed = 0.5
+        return lottieView
+    }()
+    
     private let label: UILabel = {
         let label = UILabel()
         label.text = "F1 Manager"
-        label.font = .f1(.wide, size: 38)
-        label.textColor = .label
+        label.font = .f1(.bold, size: 22)
+        label.textColor = .red
         return label
     }()
     
@@ -49,8 +58,10 @@ public final class SplashViewController: UIViewController, View {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
         addSubviews()
         setupLayoutConstraints()
+        lottieAnimationView.play()
     }
     
     public func bind(reactor: SplashReactor) {
@@ -59,14 +70,17 @@ public final class SplashViewController: UIViewController, View {
     }
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
     }
 }
 
 // MARK: - Bind
 extension SplashViewController {
     private func bindAction(_ reactor: SplashReactor) {
-        
+        rx.viewDidLoad
+            .map { Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     private func bindState(_ reactor: SplashReactor) {
@@ -77,10 +91,15 @@ extension SplashViewController {
 // MARK: - Layout
 extension SplashViewController {
     private func addSubviews() {
+        view.addSubview(lottieAnimationView)
         view.addSubview(label)
     }
     
     private func setupLayoutConstraints() {
+        lottieAnimationView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+            $0.center.equalToSuperview()
+        }
         label.snp.makeConstraints {
             $0.center.equalToSuperview()
         }

@@ -6,7 +6,7 @@
 //  Copyright © 2025 com.junhyeok.F1Manager. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 import NetworkInfra
 import SplashData

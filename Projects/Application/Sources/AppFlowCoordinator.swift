@@ -27,7 +27,6 @@ final class AppFlowCoordinator {
     func start() {
         let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer(rootNavigationController: rootNavigationController)
         let flow = mainSceneDIContainer.makeSplashCoordinator()
-//        let flow = mainSceneDIContainer.makeTabBarCoordinator()
         flow.start()
     }
 }

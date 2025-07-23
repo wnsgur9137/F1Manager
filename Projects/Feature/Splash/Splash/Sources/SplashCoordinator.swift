@@ -11,6 +11,10 @@ import UIKit
 import SplashPresentation
 import BasePresentation
 
+public protocol AppFlowDependencies {
+    func showMainFlow()
+}
+
 public protocol SplashCoordinatorDependencies {
     func makeSplashViewController(flowAction: SplashFlowAction) -> SplashViewController
 }
@@ -26,11 +30,17 @@ public final class DefaultSplashCoordinator: SplashCoordinator {
     public var childCoordinators: [Coordinator] = []
     public var type: CoordinatorType { .splash }
     
+    private let appFlowDependencies: AppFlowDependencies
     private let dependencies: SplashCoordinatorDependencies
     
-    public init(dependencies: SplashCoordinatorDependencies) {
-        self.navigationController = UINavigationController()
+    public init(
+        appFlowDependencies: AppFlowDependencies,
+        dependencies: SplashCoordinatorDependencies,
+        navigationController: UINavigationController
+    ) {
+        self.appFlowDependencies = appFlowDependencies
         self.dependencies = dependencies
+        self.navigationController = navigationController
     }
     
     public func start() {
@@ -38,8 +48,14 @@ public final class DefaultSplashCoordinator: SplashCoordinator {
     }
     
     public func showSplashViewController() {
-        let flowAction = SplashFlowAction()
+        let flowAction = SplashFlowAction(
+            showMainView: showMainView
+        )
         let viewController = dependencies.makeSplashViewController(flowAction: flowAction)
         self.navigationController?.viewControllers = [viewController]
+    }
+    
+    private func showMainView() {
+        appFlowDependencies.showMainFlow()
     }
 }
