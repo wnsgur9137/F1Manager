@@ -21,17 +21,17 @@ public final class DefaultTabBarCoordinator: TabBarCoordinator {
     public var childCoordinators: [Coordinator] = []
     public var type: CoordinatorType { .tab }
     
-    public let rootNavigtaionController: UINavigationController?
+    public let rootNavigationController: UINavigationController?
     public weak var navigationController: UINavigationController?
     public weak var tabBarController: UITabBarController?
     private let homeDIContainer: HomeDIContainer
     
     public init(
-        rootNavigtaionController: UINavigationController,
+        rootNavigationController: UINavigationController,
         tabBarController: UITabBarController,
         homeDIContainer: HomeDIContainer
     ) {
-        self.rootNavigtaionController = rootNavigtaionController
+        self.rootNavigationController = rootNavigationController
         self.tabBarController = tabBarController
         self.homeDIContainer = homeDIContainer
     }
@@ -43,7 +43,7 @@ public final class DefaultTabBarCoordinator: TabBarCoordinator {
         let controllers: [UINavigationController] = pages.map { getNavigationController($0) }
         prepareTabBarController(with: controllers)
         guard let tabBarController = self.tabBarController else { return }
-        rootNavigtaionController?.viewControllers = [tabBarController]
+        rootNavigationController?.viewControllers = [tabBarController]
     }
     
     private func getNavigationController(
