@@ -87,6 +87,16 @@ public final class HomeViewController: UIViewController, View {
         setupSeeAllButton()
         addSubviews()
         setupLayoutConstraints()
+        
+        navigationBar.rx
+            .tapGesture()
+            .when(.recognized)
+            .bind(onNext: { _ in
+                let reactor = LiveTrackingReactor()
+                let viewController = LiveTrackingViewController.create(with: reactor)
+                self.navigationController?.pushViewController(viewController, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setupNavigationBar() {
