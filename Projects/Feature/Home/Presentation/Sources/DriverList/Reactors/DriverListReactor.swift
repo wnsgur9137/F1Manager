@@ -11,6 +11,7 @@ import ReactorKit
 import RxSwift
 
 import BasePresentation
+import BaseDomain
 
 public struct DriverListFlowAction {
     let backButtonTapped: () -> Void
@@ -82,6 +83,7 @@ extension DriverListReactor {
                 driverUseCase.getDrivers(year: 2025)
                     .asObservable()
                     .flatMap { drivers -> Observable<Mutation> in
+                        let drivers = drivers.map { DriverModel(driver: $0) }
                         return Observable.concat([
                             Observable.just(.setLoading(false)),
                             Observable.just(.setDrivers(drivers))

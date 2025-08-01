@@ -13,6 +13,7 @@ let project: Project = .project(
     name: "BasePresentation",
     product: .staticFramework,
     dependencies: [
+        .Project.Base.Domain,
         .Project.LibraryManager.ReactiveLibraries,
         .Project.LibraryManager.LayoutLibraries,
         .Project.LibraryManager.UILibraries,

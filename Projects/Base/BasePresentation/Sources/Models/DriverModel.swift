@@ -8,6 +8,8 @@
 
 import Foundation
 
+import BaseDomain
+
 public struct DriverModel {
     public let driverId: String
     public let driverNumber: String?
@@ -25,6 +27,27 @@ public struct DriverModel {
     public let standingPosition: Int?
     public let standingPoints: Int?
     public let wins: Int?
+    
+    
+    /// 각 Feature마다 사용하는 model이 다를 경우 삭제 후 각 Feature에서 관리
+    public init(driver: Driver) {
+        self.driverId = driver.driverId
+        self.driverNumber = driver.driverNumber
+        self.driverCode = driver.driverCode
+        self.wikipediaURL = driver.wikipediaURL
+        self.fullName = driver.fullName
+        self.givenName = driver.givenName
+        self.familyName = driver.familyName
+        self.dateOfBirth = driver.dateOfBirth
+        self.countryCode = driver.countryCode
+        self.country = driver.country
+        self.headshotImageURL = driver.headshotImageURL
+        self.teamName = driver.teamName
+        self.teamColour = driver.teamColour
+        self.standingPosition = driver.standingPosition
+        self.standingPoints = driver.standingPoints
+        self.wins = driver.wins
+    }
     
     public init(
         driverId: String,
