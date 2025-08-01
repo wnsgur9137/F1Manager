@@ -9,10 +9,12 @@
 import Foundation
 import RxSwift
 
-import BasePresentation
-
 public enum DriverError: Error {
     case driverNotFound
+}
+
+public protocol DriverUseCase {
+    func getDrivers(year: Int) -> Single<[Driver]>
 }
 
 public final class DefaultDriverUseCase: DriverUseCase {
@@ -32,10 +34,9 @@ public final class DefaultDriverUseCase: DriverUseCase {
         return error
     }
     
-    public func getDrivers(year: Int) -> Single<[DriverModel]> {
+    public func getDrivers(year: Int) -> Single<[Driver]> {
         let driverEntities = repository.getDrivers(year: year)
         return driverEntities
-            .map { $0.map { $0.toModel() } }
             .catch { error in
                 return .error(self.handle(error))
             }

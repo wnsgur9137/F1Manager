@@ -8,8 +8,6 @@
 
 import Foundation
 
-import BasePresentation
-
 public struct Driver {
     public let driverId: String
     public let driverNumber: String?
@@ -61,28 +59,5 @@ public struct Driver {
         self.standingPosition = standingPosition
         self.standingPoints = standingPoints
         self.wins = wins
-    }
-}
-
-extension Driver {
-    func toModel() -> DriverModel {
-        return DriverModel(
-            driverId: driverId,
-            driverNumber: driverNumber,
-            driverCode: driverCode,
-            wikipediaURL: wikipediaURL,
-            fullName: fullName,
-            givenName: givenName,
-            familyName: familyName,
-            dateOfBirth: dateOfBirth,
-            countryCode: countryCode,
-            country: country,
-            headshotImageURL: headshotImageURL,
-            teamName: teamName,
-            teamColour: teamColour,
-            standingPosition: standingPosition,
-            standingPoints: standingPoints,
-            wins: wins
-        )
     }
 }

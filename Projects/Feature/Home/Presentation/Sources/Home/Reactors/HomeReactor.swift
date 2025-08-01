@@ -10,6 +10,7 @@ import Foundation
 import ReactorKit
 
 import BasePresentation
+import BaseDomain
 
 public struct HomeFlowAction {
     let navigateToDriverList: () -> Void
@@ -72,6 +73,7 @@ extension HomeReactor {
         case .viewDidLoad:
             let drivers = driverUseCase.getDrivers(year: 2025)
                 .asObservable()
+                .map { $0.map { DriverModel(driver: $0) } }
                 .map { Mutation.setDrivers($0) }
                 .catch { .just(.setError($0)) }
             return drivers

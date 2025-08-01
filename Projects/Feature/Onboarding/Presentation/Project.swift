@@ -13,6 +13,7 @@ let project: Project = .project(
     name: "OnboardingPresentation",
     product: .staticFramework,
     dependencies: [
-        .Project.Base.Presentation
+        .Project.Base.Presentation,
+        .Project.Feature.Domain.OnboardingDomain
     ]
 )
