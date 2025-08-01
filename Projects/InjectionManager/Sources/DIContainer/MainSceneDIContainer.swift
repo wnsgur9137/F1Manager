@@ -11,10 +11,11 @@ import UIKit
 import NetworkInfra
 import Features
 import Home
+import Splash
 
 public final class MainSceneDIContainer {
     
-    private let rootNavigtaionController: UINavigationController
+    private let rootNavigationController: UINavigationController
     private let tabBarController: UITabBarController
     
     struct Dependencies {
@@ -28,7 +29,7 @@ public final class MainSceneDIContainer {
         tabBarController: UITabBarController,
         dependencies: Dependencies
     ) {
-        self.rootNavigtaionController = rootNavigationController
+        self.rootNavigationController = rootNavigationController
         self.tabBarController = tabBarController
         self.dependencies = dependencies
     }
@@ -42,9 +43,31 @@ public final class MainSceneDIContainer {
     
     public func makeTabBarCoordinator() -> TabBarCoordinator {
         return DefaultTabBarCoordinator(
-            rootNavigtaionController: rootNavigtaionController,
+            rootNavigationController: rootNavigationController,
             tabBarController: tabBarController,
             homeDIContainer: makeHomeDIContainer()
         )
+    }
+    
+    private func makeSplashDIContainer() -> SplashDIContainer {
+        let dependencies = SplashDIContainer.Dependencies(
+            networkManager: dependencies.networkManager
+        )
+        return SplashDIContainer(dependencies: dependencies)
+    }
+    
+    public func makeSplashCoordinator() -> SplashCoordinator {
+        return DefaultSplashCoordinator(
+            appFlowDependencies: self,
+            dependencies: makeSplashDIContainer(),
+            navigationController: rootNavigationController
+        )
+    }
+}
+
+extension MainSceneDIContainer: AppFlowDependencies {
+    public func showMainFlow() {
+        let tabBarCoordinator = makeTabBarCoordinator()
+        tabBarCoordinator.start()
     }
 }
