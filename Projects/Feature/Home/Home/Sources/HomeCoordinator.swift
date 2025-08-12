@@ -15,6 +15,7 @@ public protocol HomeCoordinatorDependencies {
     func makeHomeViewController(flowAction: HomeFlowAction) -> HomeViewController
     func makeDriverListViewController(flowAction: DriverListFlowAction) -> DriverListViewController
     func makeDriverDetailViewController(driver: DriverModel, flowAction: DriverDetailFlowAction) -> DriverDetailViewController
+    func makeRaceDetailViewController(race: RaceModel, flowAction: RaceDetailFlowAction) -> RaceDetailViewController
 }
 
 public protocol HomeCoordinator: Coordinator {
@@ -45,7 +46,9 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
     public func showHomeViewController() {
         let flowAction = HomeFlowAction(
             navigateToDriverList: showDriverListViewController,
-            driverSelected: showDriverDetailViewController
+            driverSelected: showDriverDetailViewController,
+            navigateToRaceList: showRaceListViewController,
+            raceSelected: showRaceDetailViewController
         )
         let viewController = dependencies.makeHomeViewController(flowAction: flowAction)
         self.navigationController?.viewControllers = [viewController]
@@ -65,6 +68,17 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
             backButtonTapped: popViewController
         )
         let viewController = dependencies.makeDriverDetailViewController(driver: driver, flowAction: flowAction)
+        self.navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    private func showRaceListViewController() {
+        // TODO: Race List 화면이 구현되면 추가
+        print("Race List 화면으로 이동")
+    }
+    
+    private func showRaceDetailViewController(race: RaceModel) {
+        let flowAction = RaceDetailFlowAction()
+        let viewController = dependencies.makeRaceDetailViewController(race: race, flowAction: flowAction)
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     
