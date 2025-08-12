@@ -45,3 +45,21 @@ public extension NetworkManager {
             .map(T.self, using: JSONDecoder())
     }
 }
+
+// MARK: - Race
+public extension NetworkManager {
+    func request(_ target: RaceTargetType) -> Single<Any> {
+        return raceProvider
+            .request(target)
+            .mapJSON()
+    }
+    
+    func request<T: Decodable>(
+        _ target: RaceTargetType,
+        type: T.Type
+    ) -> Single<T> {
+        return raceProvider
+            .request(target)
+            .map(T.self, using: JSONDecoder())
+    }
+}
