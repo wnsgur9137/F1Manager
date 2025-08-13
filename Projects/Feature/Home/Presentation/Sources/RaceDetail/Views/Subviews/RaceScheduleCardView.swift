@@ -17,16 +17,20 @@ final class RaceScheduleCardView: UIView {
     
     private let containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .cellBackground
-        view.layer.cornerRadius = 16
+        view.backgroundColor = .systemBackground
+        view.layer.cornerRadius = 20
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 8)
+        view.layer.shadowRadius = 16
+        view.layer.shadowOpacity = 0.1
         return view
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Schedule"
-        label.font = .f1(.bold, size: 20)
-        label.textColor = .label
+        label.text = "WEEKEND SCHEDULE"
+        label.font = .f1(.bold, size: 18)
+        label.textColor = .systemRed
         return label
     }()
     
@@ -118,13 +122,15 @@ final class RaceScheduleCardView: UIView {
         time: String?
     ) -> UIView {
         let eventView = UIView()
-        eventView.backgroundColor = .systemGray6
-        eventView.layer.cornerRadius = 12
+        eventView.backgroundColor = title == "Race" ? UIColor.systemRed.withAlphaComponent(0.1) : UIColor.systemGray6
+        eventView.layer.cornerRadius = 16
+        eventView.layer.borderWidth = title == "Race" ? 2 : 0
+        eventView.layer.borderColor = title == "Race" ? UIColor.systemRed.cgColor : UIColor.clear.cgColor
         
         let titleLabel = UILabel()
-        titleLabel.text = title
+        titleLabel.text = title.uppercased()
         titleLabel.font = .f1(.bold, size: 16)
-        titleLabel.textColor = .label
+        titleLabel.textColor = title == "Race" ? .systemRed : .label
         
         let dateTimeLabel = UILabel()
         let dateText = formatDate(date) ?? "TBA"
@@ -133,16 +139,31 @@ final class RaceScheduleCardView: UIView {
         dateTimeLabel.font = .f1(.regular, size: 14)
         dateTimeLabel.textColor = .secondaryLabel
         
+        // F1 스타일 시간 표시를 위한 별도 라벨
+        let timeHighlightLabel = UILabel()
+        timeHighlightLabel.text = timeText
+        timeHighlightLabel.font = .f1(.bold, size: 16)
+        timeHighlightLabel.textColor = title == "Race" ? .systemRed : .label
+        
         eventView.addSubview(titleLabel)
+        eventView.addSubview(timeHighlightLabel)
         eventView.addSubview(dateTimeLabel)
         
         titleLabel.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(16)
+            $0.top.leading.equalToSuperview().inset(20)
+        }
+        
+        timeHighlightLabel.snp.makeConstraints {
+            $0.top.trailing.equalToSuperview().inset(20)
         }
         
         dateTimeLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
-            $0.leading.trailing.bottom.equalToSuperview().inset(16)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            $0.leading.trailing.bottom.equalToSuperview().inset(20)
+        }
+        
+        eventView.snp.makeConstraints {
+            $0.height.equalTo(80)
         }
         
         return eventView
