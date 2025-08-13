@@ -118,16 +118,18 @@ public final class RaceDetailViewController: UIViewController, View {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
         setupNavigationBar()
         addSubviews()
         setupLayoutConstraints()
     }
     
+    private func setupUI() {
+        view.backgroundColor = .systemBackground
+    }
+    
     private func setupNavigationBar() {
         navigationBar.setTitle("Race Details")
-        navigationBar.popButtonTapped = { [weak self] in
-            self?.navigationController?.popViewController(animated: true)
-        }
     }
     
     public func bind(reactor: RaceDetailReactor) {
@@ -141,6 +143,11 @@ extension RaceDetailViewController {
     private func bindAction(_ reactor: RaceDetailReactor) {
         rx.viewDidLoad
             .map { Reactor.Action.viewDidLoad }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        navigationBar.didTapBackButton
+            .map { Reactor.Action.backButtonTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

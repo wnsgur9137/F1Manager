@@ -9,20 +9,20 @@
 import Foundation
 
 public struct Race {
-    let season: String
-    let round: String
-    let url: String?
-    let raceName: String
-    let circuit: Circuit
-    let date: String
-    let time: String?
-    let firstPractice: RaceDate?
-    let secondPractice: RaceDate?
-    let thirdPractice: RaceDate?
-    let qualifying: RaceDate?
-    let sprint: RaceDate?
-    let sprintQualifying: RaceDate?
-    let sprintShootout: RaceDate?
+    public let season: String
+    public let round: String
+    public let url: String?
+    public let raceName: String
+    public let circuit: Circuit
+    public let date: String
+    public let time: String?
+    public let firstPractice: RaceDate?
+    public let secondPractice: RaceDate?
+    public let thirdPractice: RaceDate?
+    public let qualifying: RaceDate?
+    public let sprint: RaceDate?
+    public let sprintQualifying: RaceDate?
+    public let sprintShootout: RaceDate?
     
     public init(
         season: String,
@@ -58,11 +58,11 @@ public struct Race {
 }
 
 public struct Circuit {
-    let circuitId: String
-    let url: String?
-    let circuitName: String
-    let location: CircuitLocation?
-    let date: String?
+    public let circuitId: String
+    public let url: String?
+    public let circuitName: String
+    public let location: CircuitLocation?
+    public let date: String?
     
     public init(
         circuitId: String,
@@ -80,10 +80,10 @@ public struct Circuit {
 }
 
 public struct CircuitLocation {
-    let lat: String
-    let long: String
-    let locality: String
-    let country: String
+    public let lat: String
+    public let long: String
+    public let locality: String
+    public let country: String
     
     public init(
         lat: String,
@@ -99,8 +99,8 @@ public struct CircuitLocation {
 }
 
 public struct RaceDate {
-    let date: String?
-    let time: String?
+    public let date: String?
+    public let time: String?
     
     public init(
         date: String?,

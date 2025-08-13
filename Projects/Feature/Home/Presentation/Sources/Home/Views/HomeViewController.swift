@@ -123,10 +123,15 @@ public final class HomeViewController: UIViewController, View {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
         setupNavigationBar()
         setupButtons()
         addSubviews()
         setupLayoutConstraints()
+    }
+    
+    private func setupUI() {
+        view.backgroundColor = .systemBackground
     }
     
     private func setupNavigationBar() {

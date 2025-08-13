@@ -77,7 +77,7 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
     }
     
     private func showRaceDetailViewController(race: RaceModel) {
-        let flowAction = RaceDetailFlowAction()
+        let flowAction = RaceDetailFlowAction(backButtonTapped: popViewController)
         let viewController = dependencies.makeRaceDetailViewController(race: race, flowAction: flowAction)
         self.navigationController?.pushViewController(viewController, animated: true)
     }

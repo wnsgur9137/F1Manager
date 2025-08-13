@@ -144,6 +144,7 @@ final class RaceCollectionViewCell: UICollectionViewCell {
     private func formatDate(_ dateString: String) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.locale = Locale(identifier: "en_US")
         
         if let date = dateFormatter.date(from: dateString) {
             dateFormatter.dateFormat = "MMM dd"

@@ -112,7 +112,11 @@ final class RaceScheduleCardView: UIView {
         }
     }
     
-    private func createEventView(title: String, date: String?, time: String?) -> UIView {
+    private func createEventView(
+        title: String,
+        date: String?,
+        time: String?
+    ) -> UIView {
         let eventView = UIView()
         eventView.backgroundColor = .systemGray6
         eventView.layer.cornerRadius = 12
@@ -141,10 +145,6 @@ final class RaceScheduleCardView: UIView {
             $0.leading.trailing.bottom.equalToSuperview().inset(16)
         }
         
-        eventView.snp.makeConstraints {
-            $0.height.equalTo(60)
-        }
-        
         return eventView
     }
     
@@ -153,6 +153,7 @@ final class RaceScheduleCardView: UIView {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.locale = Locale(identifier: "en_US")
         
         if let date = dateFormatter.date(from: dateString) {
             dateFormatter.dateFormat = "MMM dd, yyyy"

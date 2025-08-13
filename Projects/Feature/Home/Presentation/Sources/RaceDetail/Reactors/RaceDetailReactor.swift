@@ -13,8 +13,10 @@ import BasePresentation
 import BaseDomain
 
 public struct RaceDetailFlowAction {
-    public init() {
-        
+    let backButtonTapped: () -> Void
+    
+    public init(backButtonTapped: @escaping() -> Void) {
+        self.backButtonTapped = backButtonTapped
     }
 }
 
@@ -26,6 +28,7 @@ public final class RaceDetailReactor: Reactor {
     
     public enum Action {
         case viewDidLoad
+        case backButtonTapped
     }
     
     public enum Mutation {
@@ -63,6 +66,9 @@ extension RaceDetailReactor {
         switch action {
         case .viewDidLoad:
             return .just(.setRace(race))
+        case .backButtonTapped:
+            flowAction.backButtonTapped()
+            return .empty()
         }
     }
     
