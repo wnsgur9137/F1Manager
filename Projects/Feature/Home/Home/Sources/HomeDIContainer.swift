@@ -120,6 +120,23 @@ extension HomeDIContainer: HomeCoordinatorDependencies {
         return viewController
     }
     
+    // MARK: - RaceList
+    
+    private func makeRaceListReactor(flowAction: RaceListFlowAction) -> RaceListReactor {
+        let raceUseCase = makeRaceUseCase()
+        let reactor = RaceListReactor(
+            flowAction: flowAction,
+            raceUseCase: raceUseCase
+        )
+        return reactor
+    }
+    
+    public func makeRaceListViewController(flowAction: RaceListFlowAction) -> RaceListViewController {
+        let reactor = makeRaceListReactor(flowAction: flowAction)
+        let viewController = RaceListViewController.create(with: reactor)
+        return viewController
+    }
+    
     // MARK: - RaceDetail
     
     private func makeRaceDetailReactor(
