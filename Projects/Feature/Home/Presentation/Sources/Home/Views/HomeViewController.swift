@@ -189,7 +189,7 @@ extension HomeViewController {
         reactor.pulse(\.$races)
             .compactMap { $0 }
             .map { races in
-                return Array(races.prefix(10))
+                return Array(self.getUpcomingRaces(from: races).prefix(5))
             }
             .bind(onNext: { [weak self] races in
                 self?.races = races
@@ -337,5 +337,24 @@ extension HomeViewController {
             $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(160)
         }
+    }
+    
+    private func getUpcomingRaces(from races: [RaceModel]) -> [RaceModel] {
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.locale = Locale(identifier: "en_US")
+        
+        return races
+            .compactMap { race -> (RaceModel, Date)? in
+                guard let raceDate = dateFormatter.date(from: race.date) else { return nil }
+                return (race, raceDate)
+            }
+            .filter { _, raceDate in
+                // 현재 날짜와 같거나 미래의 레이스만 필터링
+                Calendar.current.compare(raceDate, to: currentDate, toGranularity: .day) != .orderedAscending
+            }
+            .sorted { $0.1 < $1.1 } // 날짜순으로 정렬
+            .map { $0.0 } // RaceModel만 반환
     }
 }
