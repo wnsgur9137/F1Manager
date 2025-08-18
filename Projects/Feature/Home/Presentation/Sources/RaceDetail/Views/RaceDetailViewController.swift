@@ -319,7 +319,8 @@ extension RaceDetailViewController {
         
         scrollView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
-            $0.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(view)
         }
         
         contentView.snp.makeConstraints {

@@ -16,23 +16,6 @@ import BasePresentation
 
 public final class RaceListViewController: UIViewController, View {
     
-    private enum Filter: CaseIterable {
-        case allRaces
-        case upcoming
-        case completed
-        
-        func title() -> String {
-            switch self {
-            case .allRaces:
-                return "All Races"
-            case .upcoming:
-                return "Upcoming"
-            case .completed:
-                return "Completed"
-            }
-        }
-    }
-    
     // MARK: - UI Components
     
     private let navigationBar = NavigationBar(.popButton)
@@ -58,31 +41,16 @@ public final class RaceListViewController: UIViewController, View {
         return label
     }()
     
-    private let filterSegmentedControl: UISegmentedControl = {
-        let items = Filter.allCases.map { $0.title() }
-        let segmentedControl = UISegmentedControl(items: items)
-        segmentedControl.selectedSegmentIndex = 1 // Upcoming이 기본값
-        segmentedControl.backgroundColor = .systemGray6
-        segmentedControl.selectedSegmentTintColor = .systemRed
-        segmentedControl.setTitleTextAttributes([
-            .foregroundColor: UIColor.white,
-            .font: UIFont.f1(.bold, size: 14)
-        ], for: .selected)
-        segmentedControl.setTitleTextAttributes([
-            .foregroundColor: UIColor.secondaryLabel,
-            .font: UIFont.f1(.regular, size: 14)
-        ], for: .normal)
+    private var filterSegmentedControl: UISegmentedControl = {
+        let segmentedControl = UISegmentedControl()
         return segmentedControl
     }()
     
-    private lazy var tableView: UITableView = {
+    private let raceListTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
-        tableView.register(RaceListTableViewCell.self, forCellReuseIdentifier: RaceListTableViewCell.identifier)
-        tableView.delegate = self
-        tableView.dataSource = self
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0)
         return tableView
     }()
@@ -111,17 +79,8 @@ public final class RaceListViewController: UIViewController, View {
     
     // MARK: - Properties
     
-    private var allRaces: [RaceModel] = []
-    private var filteredRaces: [RaceModel] = []
-    private var currentFilter: RaceFilter = .upcoming
-    
     public var disposeBag = DisposeBag()
-    
-    private enum RaceFilter: Int, CaseIterable {
-        case all = 0
-        case upcoming = 1
-        case completed = 2
-    }
+    private var adapter: RaceListAdapter?
     
     // MARK: - Life cycle
     
@@ -146,7 +105,6 @@ public final class RaceListViewController: UIViewController, View {
         setupNavigationBar()
         addSubviews()
         setupLayoutConstraints()
-        setupActions()
     }
     
     private func setupUI() {
@@ -157,19 +115,56 @@ public final class RaceListViewController: UIViewController, View {
         navigationBar.setTitle("Race Calendar")
     }
     
-    private func setupActions() {
-        filterSegmentedControl.addTarget(self, action: #selector(filterChanged(_:)), for: .valueChanged)
-    }
-    
-    @objc private func filterChanged(_ sender: UISegmentedControl) {
-        guard let filter = RaceFilter(rawValue: sender.selectedSegmentIndex) else { return }
-        currentFilter = filter
-        applyFilter()
-    }
-    
     public func bind(reactor: RaceListReactor) {
         bindAction(reactor)
         bindState(reactor)
+        setupAdapter(with: reactor)
+    }
+    
+    private func setupAdapter(with reactor: RaceListReactor) {
+        let adapter = RaceListAdapter(
+            raceListTableView: raceListTableView,
+            dataSource: reactor,
+            delegate: self
+        )
+        self.adapter = adapter
+    }
+    
+    private func setupFilterSegmentedControl(_ filters: [RaceListReactor.RaceFilter]) {
+        // 기존 segmentedControl 제거
+        filterSegmentedControl.removeFromSuperview()
+        
+        let items = filters.map { $0.title() }
+        let segmentedControl = UISegmentedControl(items: items)
+        segmentedControl.backgroundColor = .systemGray6
+        segmentedControl.selectedSegmentTintColor = .systemRed
+        segmentedControl.setTitleTextAttributes([
+            .foregroundColor: UIColor.white,
+            .font: UIFont.f1(.bold, size: 14)
+        ], for: .selected)
+        segmentedControl.setTitleTextAttributes([
+            .foregroundColor: UIColor.secondaryLabel,
+            .font: UIFont.f1(.regular, size: 14)
+        ], for: .normal)
+        
+        self.filterSegmentedControl = segmentedControl
+        
+        // 뷰 계층에 다시 추가
+        headerView.addSubview(filterSegmentedControl)
+        
+        // 제약조건 재설정
+        filterSegmentedControl.snp.makeConstraints {
+            $0.top.equalTo(raceCountLabel.snp.bottom).offset(20)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.height.equalTo(36)
+        }
+        
+        if let reactor = reactor {
+            filterSegmentedControl.rx.selectedSegmentIndex
+                .map { Reactor.Action.filterChanged($0) }
+                .bind(to: reactor.action)
+                .disposed(by: disposeBag)
+        }
     }
 }
 
@@ -188,13 +183,25 @@ extension RaceListViewController {
     }
     
     private func bindState(_ reactor: RaceListReactor) {
-        reactor.pulse(\.$races)
+        reactor.pulse(\.$raceFilters)
             .compactMap { $0 }
-            .bind(onNext: { [weak self] races in
-                self?.allRaces = races
-                self?.applyFilter()
+            .bind(onNext: { [weak self] filters in
+                self?.setupFilterSegmentedControl(filters)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$currentRaceFilter)
+            .bind(onNext: { [weak self] filter in
+                self?.filterSegmentedControl.selectedSegmentIndex = filter.rawValue
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$racesDidUpdate)
+            .compactMap { $0 }
+            .bind(onNext: { [weak self] in
                 self?.updateRaceCount()
                 self?.hideLoading()
+                self?.raceListTableView.reloadData()
             })
             .disposed(by: disposeBag)
         
@@ -208,33 +215,11 @@ extension RaceListViewController {
     }
 }
 
-// MARK: - Filter Logic
+// MARK: - Helper Methods
 extension RaceListViewController {
-    private func applyFilter() {
-        let currentDate = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        switch currentFilter {
-        case .all:
-            filteredRaces = allRaces
-        case .upcoming:
-            filteredRaces = allRaces.filter { race in
-                guard let raceDate = dateFormatter.date(from: race.date) else { return false }
-                return Calendar.current.compare(raceDate, to: currentDate, toGranularity: .day) != .orderedAscending
-            }
-        case .completed:
-            filteredRaces = allRaces.filter { race in
-                guard let raceDate = dateFormatter.date(from: race.date) else { return false }
-                return Calendar.current.compare(raceDate, to: currentDate, toGranularity: .day) == .orderedAscending
-            }
-        }
-        
-        tableView.reloadData()
-    }
-    
     private func updateRaceCount() {
-        let totalRaces = allRaces.count
+        guard let reactor = reactor else { return }
+        let totalRaces = reactor.numberOfRows(in: 0)
         raceCountLabel.text = "\(totalRaces) Races"
     }
     
@@ -249,32 +234,14 @@ extension RaceListViewController {
     }
 }
 
-// MARK: - UITableViewDataSource
-extension RaceListViewController: UITableViewDataSource {
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return filteredRaces.count
-    }
-    
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: RaceListTableViewCell.identifier, for: indexPath) as? RaceListTableViewCell else {
-            return UITableViewCell()
-        }
-        
-        let race = filteredRaces[indexPath.row]
-        cell.configure(with: race)
-        return cell
-    }
-}
-
-// MARK: - UITableViewDelegate
-extension RaceListViewController: UITableViewDelegate {
-    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+// MARK: - RaceListDelegate
+extension RaceListViewController: RaceListDelegate {
+    func heightForRow(at indexPath: IndexPath) -> CGFloat {
         return 140
     }
     
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedRace = filteredRaces[indexPath.row]
-        reactor?.action.onNext(.raceSelected(selectedRace))
+    func didSelectRow(at indexPath: IndexPath) {
+        reactor?.action.onNext(.raceSelectedAt(indexPath))
     }
 }
 
@@ -283,7 +250,7 @@ extension RaceListViewController {
     private func addSubviews() {
         view.addSubview(navigationBar)
         view.addSubview(headerView)
-        view.addSubview(tableView)
+        view.addSubview(raceListTableView)
         view.addSubview(loadingView)
         
         headerView.addSubview(seasonLabel)
@@ -322,9 +289,10 @@ extension RaceListViewController {
             $0.height.equalTo(36)
         }
         
-        tableView.snp.makeConstraints {
+        raceListTableView.snp.makeConstraints {
             $0.top.equalTo(headerView.snp.bottom)
-            $0.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(view)
         }
         
         loadingView.snp.makeConstraints {

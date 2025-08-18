@@ -31,19 +31,40 @@ enum RaceListError: Error {
 
 public final class RaceListReactor: Reactor {
     
+    public enum RaceFilter: Int, CaseIterable {
+        case allRaces = 0
+        case upcoming = 1
+        case completed = 2
+        
+        func title() -> String {
+            switch self {
+            case .allRaces:
+                return "All Races"
+            case .upcoming:
+                return "Upcoming"
+            case .completed:
+                return "Completed"
+            }
+        }
+    }
+    
     public enum Action {
         case viewDidLoad
         case backButtonTapped
-        case raceSelected(RaceModel)
+        case filterChanged(Int)
+        case raceSelectedAt(IndexPath)
     }
     
     public enum Mutation {
         case setRaces([RaceModel])
         case setError(Error)
+        case setCurrentFilter(RaceFilter)
     }
     
     public struct State {
-        @Pulse var races: [RaceModel]?
+        @Pulse var raceFilters: [RaceFilter]?
+        @Pulse var currentRaceFilter: RaceFilter = .upcoming
+        @Pulse var racesDidUpdate: Void?
         @Pulse var error: RaceListError?
     }
     
@@ -51,6 +72,9 @@ public final class RaceListReactor: Reactor {
     private let flowAction: RaceListFlowAction
     private let raceUseCase: RaceUseCase
     private let disposeBag = DisposeBag()
+    
+    private var races = [RaceModel]()
+    private var filteredRaces = [RaceModel]()
     
     public init(
         flowAction: RaceListFlowAction,
@@ -82,7 +106,12 @@ extension RaceListReactor {
             flowAction.backButtonTapped()
             return .empty()
             
-        case let .raceSelected(race):
+        case let .filterChanged(index):
+            guard let filter = RaceFilter(rawValue: index) else { return .empty() }
+            return .just(.setCurrentFilter(filter))
+            
+        case let .raceSelectedAt(indexPath):
+            let race = filteredRaces[indexPath.row]
             flowAction.raceSelected(race)
             return .empty()
         }
@@ -95,10 +124,55 @@ extension RaceListReactor {
         var state = state
         switch mutation {
         case let .setRaces(races):
-            state.races = races
+            self.races = races
+            self.apply(filter: .upcoming)
+            state.raceFilters = RaceFilter.allCases
+            state.currentRaceFilter = .upcoming
+            state.racesDidUpdate = Void()
         case let .setError(error):
             state.error = handle(error)
+        case let .setCurrentFilter(filter):
+            self.apply(filter: filter)
+            state.currentRaceFilter = filter
+            state.racesDidUpdate = Void()
         }
         return state
+    }
+}
+
+// MARK: - RaceListDataSource
+extension RaceListReactor: RaceListDataSource {
+    func numberOfRows(in section: Int) -> Int {
+        return filteredRaces.count
+    }
+    
+    func cellForRow(at indexPath: IndexPath) -> RaceModel? {
+        guard indexPath.row < filteredRaces.count else { return nil }
+        return filteredRaces[indexPath.row]
+    }
+}
+
+// MARK: - Helper Methods
+extension RaceListReactor {
+    private func apply(filter: RaceFilter) {
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.locale = Locale(identifier: "en_US")
+        
+        switch filter {
+        case .allRaces:
+            filteredRaces = races
+        case .upcoming:
+            filteredRaces = races.filter { race in
+                guard let raceDate = dateFormatter.date(from: race.date) else { return false }
+                return Calendar.current.compare(raceDate, to: currentDate, toGranularity: .day) != .orderedAscending
+            }
+        case .completed:
+            filteredRaces = races.filter { race in
+                guard let raceDate = dateFormatter.date(from: race.date) else { return false }
+                return Calendar.current.compare(raceDate, to: currentDate, toGranularity: .day) == .orderedAscending
+            }
+        }
     }
 }
