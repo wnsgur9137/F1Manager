@@ -111,7 +111,7 @@ extension RaceListReactor {
             return .just(.setCurrentFilter(filter))
             
         case let .raceSelectedAt(indexPath):
-            let race = filteredRaces[indexPath.row]
+            guard let race = filteredRaces[safe: indexPath.row] else { return .empty() }
             flowAction.raceSelected(race)
             return .empty()
         }
@@ -147,8 +147,7 @@ extension RaceListReactor: RaceListDataSource {
     }
     
     func cellForRow(at indexPath: IndexPath) -> RaceModel? {
-        guard indexPath.row < filteredRaces.count else { return nil }
-        return filteredRaces[indexPath.row]
+        return filteredRaces[safe: indexPath.row]
     }
 }
 

@@ -30,27 +30,18 @@ struct DriverStandingResponseDTO: Decodable {
 struct DriverStandingsTableResponseDTO: Decodable {
     let driverStandings: [DriverStandingResponseDTO]
     
-    private enum RootKeys: String, CodingKey {
-        case MRData
-    }
-    
-    private enum MRDataKeys: String, CodingKey {
-        case StandingsTable
-    }
-    
-    private enum StandingsTableKeys: String, CodingKey {
-        case StandingsLists
-    }
-    
-    private enum StandingsListKeys: String, CodingKey {
-        case DriverStandings
+    enum CodingKeys: String, CodingKey {
+        case mrData = "MRData"
+        case standingsTable = "StandingsTable"
+        case standingsLists = "StandingsLists"
+        case driverStandings = "DriverStandings"
     }
     
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: RootKeys.self)
-        let mrData = try container.nestedContainer(keyedBy: MRDataKeys.self, forKey: .MRData)
-        let standingsTable = try mrData.nestedContainer(keyedBy: StandingsTableKeys.self, forKey: .StandingsTable)
-        let standingsListsArray = try standingsTable.decode([StandingsList].self, forKey: .StandingsLists)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let mrData = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .mrData)
+        let standingsTable = try mrData.nestedContainer(keyedBy: CodingKeys.self, forKey: .standingsTable)
+        let standingsListsArray = try standingsTable.decode([StandingsList].self, forKey: .standingsLists)
         
         // StandingsLists 배열의 첫 번째 요소에서 DriverStandings 추출
         self.driverStandings = standingsListsArray.first?.driverStandings ?? []

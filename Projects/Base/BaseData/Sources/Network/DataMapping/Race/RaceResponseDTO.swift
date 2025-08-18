@@ -60,7 +60,7 @@ extension RaceResponseDTO {
             thirdPractice: self.thirdPractice?.toDomain(),
             qualifying: self.qualifying?.toDomain(),
             sprint: self.sprint?.toDomain(),
-            sprintQualifying: self.sprint?.toDomain(),
+            sprintQualifying: self.sprintQualifying?.toDomain(),
             sprintShootout: self.sprintShootout?.toDomain()
         )
     }
@@ -134,15 +134,15 @@ struct RacesResponseDTO: Decodable {
     let races: [RaceResponseDTO]
     
     enum CodingKeys: String, CodingKey {
-        case MRData
-        case RaceTable
-        case Races
+        case mrData = "MRData"
+        case raceTable = "RaceTable"
+        case races = "Races"
     }
     
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let mrData = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .MRData)
-        let raceTable = try mrData.nestedContainer(keyedBy: CodingKeys.self, forKey: .RaceTable)
-        self.races = try raceTable.decode([RaceResponseDTO].self, forKey: .Races)
+        let mrData = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .mrData)
+        let raceTable = try mrData.nestedContainer(keyedBy: CodingKeys.self, forKey: .raceTable)
+        self.races = try raceTable.decode([RaceResponseDTO].self, forKey: .races)
     }
 }
