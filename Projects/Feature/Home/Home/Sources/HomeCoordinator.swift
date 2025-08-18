@@ -44,6 +44,7 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
         showHomeViewController()
     }
     
+    // MARK: - HomeView
     public func showHomeViewController() {
         let flowAction = HomeFlowAction(
             navigateToDriverList: showDriverListViewController,
@@ -55,6 +56,7 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
         self.navigationController?.viewControllers = [viewController]
     }
     
+    // MARK: - DriverList
     private func showDriverListViewController() {
         let flowAction = DriverListFlowAction(
             backButtonTapped: popViewController,
@@ -65,6 +67,7 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     
+    // MARK: - DriverDetail
     private func showDriverDetailViewController(driver: DriverModel) {
         let flowAction = DriverDetailFlowAction(
             backButtonTapped: popViewController
@@ -74,6 +77,7 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     
+    // MARK: - RaceList
     private func showRaceListViewController() {
         let flowAction = RaceListFlowAction(
             backButtonTapped: popViewController,
@@ -84,6 +88,7 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     
+    // MARK: - RaceDetail
     private func showRaceDetailViewController(race: RaceModel) {
         let flowAction = RaceDetailFlowAction(backButtonTapped: popViewController)
         let viewController = dependencies.makeRaceDetailViewController(race: race, flowAction: flowAction)
@@ -91,6 +96,7 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     
+    // MARK: - PopViewController
     private func popViewController() {
         navigationController?.popViewController(animated: true)
     }

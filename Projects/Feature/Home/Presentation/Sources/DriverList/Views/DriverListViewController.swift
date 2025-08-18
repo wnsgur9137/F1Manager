@@ -20,14 +20,11 @@ public final class DriverListViewController: UIViewController, View {
     
     private let navigationBar = NavigationBar(.popButton)
     
-    private lazy var driversTableView: UITableView = {
+    private let driversTableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .systemBackground
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
-        tableView.register(DriverListTableViewCell.self, forCellReuseIdentifier: DriverListTableViewCell.identifier)
-        tableView.delegate = self
-        tableView.dataSource = self
         return tableView
     }()
     
@@ -39,8 +36,8 @@ public final class DriverListViewController: UIViewController, View {
     
     // MARK: - Properties
     
-    private var drivers: [DriverModel] = []
     public var disposeBag = DisposeBag()
+    private var adapter: DriverListAdapter?
     
     // MARK: - Life cycle
     
@@ -79,6 +76,16 @@ public final class DriverListViewController: UIViewController, View {
     public func bind(reactor: DriverListReactor) {
         bindAction(reactor)
         bindState(reactor)
+        setupAdapter(with: reactor)
+    }
+    
+    private func setupAdapter(with reactor: DriverListReactor) {
+        let adapter = DriverListAdapter(
+            driversTableView: driversTableView,
+            dataSource: reactor,
+            delegate: self
+        )
+        self.adapter = adapter
     }
 }
 
@@ -97,19 +104,9 @@ extension DriverListViewController {
     }
     
     private func bindState(_ reactor: DriverListReactor) {
-        reactor.pulse(\.$drivers)
+        reactor.pulse(\.$driversDidUpdate)
             .compactMap { $0 }
-            .map { drivers in
-                return drivers.sorted { (first, second) in
-                    guard let firstPosition = first.standingPosition,
-                          let secondPosition = second.standingPosition else {
-                        return false
-                    }
-                    return firstPosition < secondPosition
-                }
-            }
-            .bind(onNext: { [weak self] drivers in
-                self?.drivers = drivers
+            .bind(onNext: { [weak self] _ in
                 self?.driversTableView.reloadData()
                 self?.loadingIndicator.stopAnimating()
             })
@@ -171,32 +168,13 @@ extension DriverListViewController {
     }
 }
 
-// MARK: - UITableViewDataSource
-extension DriverListViewController: UITableViewDataSource {
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return drivers.count
-    }
-    
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: DriverListTableViewCell.identifier, for: indexPath) as? DriverListTableViewCell else {
-            return UITableViewCell()
-        }
-        
-        let driver = drivers[indexPath.row]
-        cell.configure(with: driver)
-        return cell
-    }
-}
-
-// MARK: - UITableViewDelegate
-extension DriverListViewController: UITableViewDelegate {
-    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+// MARK: - DriverListDelegate
+extension DriverListViewController: DriverListDelegate {
+    func heightForRow(at indexPath: IndexPath) -> CGFloat {
         return 100
     }
     
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let driver = drivers[indexPath.row]
-        reactor?.action.onNext(.driverSelected(driver))
+    func didSelectRow(at indexPath: IndexPath) {
+        reactor?.action.onNext(.driverSelectedAt(indexPath))
     }
 }
