@@ -16,6 +16,23 @@ import BasePresentation
 
 public final class RaceListViewController: UIViewController, View {
     
+    private enum Filter: CaseIterable {
+        case allRaces
+        case upcoming
+        case completed
+        
+        func title() -> String {
+            switch self {
+            case .allRaces:
+                return "All Races"
+            case .upcoming:
+                return "Upcoming"
+            case .completed:
+                return "Completed"
+            }
+        }
+    }
+    
     // MARK: - UI Components
     
     private let navigationBar = NavigationBar(.popButton)
@@ -42,9 +59,9 @@ public final class RaceListViewController: UIViewController, View {
     }()
     
     private let filterSegmentedControl: UISegmentedControl = {
-        let items = ["All Races", "Upcoming", "Completed"]
+        let items = Filter.allCases.map { $0.title() }
         let segmentedControl = UISegmentedControl(items: items)
-        segmentedControl.selectedSegmentIndex = 0
+        segmentedControl.selectedSegmentIndex = 1 // Upcoming이 기본값
         segmentedControl.backgroundColor = .systemGray6
         segmentedControl.selectedSegmentTintColor = .systemRed
         segmentedControl.setTitleTextAttributes([
@@ -96,7 +113,7 @@ public final class RaceListViewController: UIViewController, View {
     
     private var allRaces: [RaceModel] = []
     private var filteredRaces: [RaceModel] = []
-    private var currentFilter: RaceFilter = .all
+    private var currentFilter: RaceFilter = .upcoming
     
     public var disposeBag = DisposeBag()
     
@@ -269,20 +286,12 @@ extension RaceListViewController {
         view.addSubview(tableView)
         view.addSubview(loadingView)
         
-        [
-            seasonLabel,
-            raceCountLabel,
-            filterSegmentedControl
-        ].forEach {
-            headerView.addSubview($0)
-        }
+        headerView.addSubview(seasonLabel)
+        headerView.addSubview(raceCountLabel)
+        headerView.addSubview(filterSegmentedControl)
         
-        [
-            activityIndicator,
-            loadingLabel
-        ].forEach {
-            loadingView.addSubview($0)
-        }
+        loadingView.addSubview(activityIndicator)
+        loadingView.addSubview(loadingLabel)
     }
     
     private func setupLayoutConstraints() {

@@ -190,12 +190,8 @@ extension RaceScheduleCardView {
     private func addSubviews() {
         addSubview(containerView)
         
-        [
-            titleLabel,
-            stackView
-        ].forEach {
-            containerView.addSubview($0)
-        }
+        containerView.addSubview(titleLabel)
+        containerView.addSubview(stackView)
     }
     
     private func setupLayoutConstraints() {

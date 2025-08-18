@@ -292,39 +292,23 @@ extension RaceDetailViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        [
-            heroSectionView,
-            raceDateCardView,
-            scheduleCardView
-        ].forEach {
-            contentView.addSubview($0)
-        }
+        contentView.addSubview(heroSectionView)
+        contentView.addSubview(raceDateCardView)
+        contentView.addSubview(scheduleCardView)
         
-        [
-            heroBackgroundImageView,
-            roundBadge,
-            raceNameLabel,
-            circuitNameLabel,
-            locationStackView
-        ].forEach {
-            heroSectionView.addSubview($0)
-        }
+        heroSectionView.addSubview(heroBackgroundImageView)
+        heroSectionView.addSubview(roundBadge)
+        heroSectionView.addSubview(raceNameLabel)
+        heroSectionView.addSubview(circuitNameLabel)
+        heroSectionView.addSubview(locationStackView)
         
         roundBadge.addSubview(roundLabel)
         
-        [
-            countryFlagLabel,
-            locationLabel
-        ].forEach {
-            locationStackView.addArrangedSubview($0)
-        }
+        locationStackView.addArrangedSubview(countryFlagLabel)
+        locationStackView.addArrangedSubview(locationLabel)
         
-        [
-            raceDateLabel,
-            raceTimeLabel
-        ].forEach {
-            raceDateCardView.addSubview($0)
-        }
+        raceDateCardView.addSubview(raceDateLabel)
+        raceDateCardView.addSubview(raceTimeLabel)
     }
     
     private func setupLayoutConstraints() {

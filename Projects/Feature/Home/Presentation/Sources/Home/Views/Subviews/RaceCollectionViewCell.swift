@@ -160,31 +160,19 @@ extension RaceCollectionViewCell {
     private func addSubviews() {
         contentView.addSubview(containerView)
         
-        [
-            roundBadge,
-            raceNameLabel,
-            circuitNameLabel,
-            locationStackView,
-            dateStackView
-        ].forEach {
-            containerView.addSubview($0)
-        }
+        containerView.addSubview(roundBadge)
+        containerView.addSubview(raceNameLabel)
+        containerView.addSubview(circuitNameLabel)
+        containerView.addSubview(locationStackView)
+        containerView.addSubview(dateStackView)
         
         roundBadge.addSubview(roundLabel)
         
-        [
-            countryFlagLabel,
-            locationLabel
-        ].forEach {
-            locationStackView.addArrangedSubview($0)
-        }
+        locationStackView.addArrangedSubview(countryFlagLabel)
+        locationStackView.addArrangedSubview(locationLabel)
         
-        [
-            dateLabel,
-            timeLabel
-        ].forEach {
-            dateStackView.addArrangedSubview($0)
-        }
+        dateStackView.addArrangedSubview(dateLabel)
+        dateStackView.addArrangedSubview(timeLabel)
     }
     
     private func setupLayoutConstraints() {

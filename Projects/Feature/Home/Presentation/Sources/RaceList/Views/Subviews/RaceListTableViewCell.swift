@@ -165,6 +165,18 @@ final class RaceListTableViewCell: UITableViewCell {
         backgroundColor = .clear
         selectionStyle = .none
         containerView.layer.insertSublayer(gradientLayer, at: 0)
+        
+        // Content priority 설정 - dateTimeStackView가 우선순위를 가지도록
+        raceNameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        circuitNameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        dateLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        timeLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        
+        // Hugging priority 설정
+        dateLabel.setContentHuggingPriority(.required, for: .horizontal)
+        timeLabel.setContentHuggingPriority(.required, for: .horizontal)
+        raceNameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        circuitNameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
     }
     
     // MARK: - Configuration
@@ -235,33 +247,20 @@ extension RaceListTableViewCell {
     private func addSubviews() {
         contentView.addSubview(containerView)
         
-        [
-            roundBadge,
-            statusIndicator,
-            raceNameLabel,
-            circuitNameLabel,
-            locationStackView,
-            dateTimeStackView,
-            chevronImageView
-        ].forEach {
-            containerView.addSubview($0)
-        }
-        
+        containerView.addSubview(roundBadge)
         roundBadge.addSubview(roundLabel)
+        containerView.addSubview(statusIndicator)
+        containerView.addSubview(raceNameLabel)
+        containerView.addSubview(circuitNameLabel)
+        containerView.addSubview(locationStackView)
+        containerView.addSubview(dateTimeStackView)
+        containerView.addSubview(chevronImageView)
         
-        [
-            countryFlagLabel,
-            locationLabel
-        ].forEach {
-            locationStackView.addArrangedSubview($0)
-        }
+        locationStackView.addArrangedSubview(countryFlagLabel)
+        locationStackView.addArrangedSubview(locationLabel)
         
-        [
-            dateLabel,
-            timeLabel
-        ].forEach {
-            dateTimeStackView.addArrangedSubview($0)
-        }
+        dateTimeStackView.addArrangedSubview(dateLabel)
+        dateTimeStackView.addArrangedSubview(timeLabel)
     }
     
     private func setupLayoutConstraints() {
@@ -289,13 +288,13 @@ extension RaceListTableViewCell {
         raceNameLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(20)
             $0.leading.equalTo(statusIndicator.snp.trailing).offset(12)
-            $0.trailing.equalTo(dateTimeStackView.snp.leading).offset(-16)
+            $0.trailing.lessThanOrEqualTo(dateTimeStackView.snp.leading).offset(-16)
         }
         
         circuitNameLabel.snp.makeConstraints {
             $0.top.equalTo(raceNameLabel.snp.bottom).offset(4)
             $0.leading.equalTo(raceNameLabel)
-            $0.trailing.equalTo(raceNameLabel)
+            $0.trailing.lessThanOrEqualTo(dateTimeStackView.snp.leading).offset(-16)
         }
         
         locationStackView.snp.makeConstraints {
@@ -307,6 +306,7 @@ extension RaceListTableViewCell {
         dateTimeStackView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.trailing.equalTo(chevronImageView.snp.leading).offset(-12)
+            $0.width.greaterThanOrEqualTo(80)
         }
         
         chevronImageView.snp.makeConstraints {
