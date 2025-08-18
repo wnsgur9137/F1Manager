@@ -1,87 +1,154 @@
-# F1Manager 프로젝트 가이드라인
+# F1Manager Project Guidelines
 
-## 프로젝트 개요
-F1Manager는 모듈화된 Clean Architecture를 기반으로 한 iOS 애플리케이션입니다.
+## Project Overview
+F1Manager is an iOS application built on modularized Clean Architecture principles, providing comprehensive Formula 1 race and driver information with an official F1 app-inspired design.
 
-## 아키텍처 구조
-- **Clean Architecture**: Domain, Data, Presentation 레이어 분리
-- **Tuist**: 모듈화된 프로젝트 관리
-- **DI Container**: 의존성 주입 패턴
-- **Coordinator Pattern**: 화면 전환 관리
-- **ReactorKit**: 반응형 프로그래밍 (RxSwift 기반)
+## Architecture Structure
+- **Clean Architecture**: Separation of Domain, Data, and Presentation layers
+- **Tuist**: Modularized project management
+- **DI Container**: Dependency injection pattern
+- **Coordinator Pattern**: Navigation flow management
+- **ReactorKit**: Reactive programming (RxSwift-based)
 
-## 디렉토리 구조
+## Directory Structure
 ```
 Projects/
-├── Application/         # 메인 앱 타겟
-├── Base/               # 공통 기반 모듈
-│   ├── BaseData/       # 공통 데이터 레이어
-│   ├── BaseDomain/     # 공통 도메인 레이어
-│   └── BasePresentation/ # 공통 프레젠테이션 레이어
-├── Feature/            # 기능별 모듈
-│   ├── Features/       # TabBar 관리
-│   ├── Home/          # 홈 기능
-│   ├── Onboarding/    # 온보딩 기능
-│   └── Splash/        # 스플래시 기능
-├── Infrastructure/     # 인프라 레이어
-│   └── NetworkInfra/  # 네트워크 관리
-├── InjectionManager/   # DI 컨테이너
-└── LibraryManager/     # 외부 라이브러리 관리
+├── Application/         # Main app target
+├── Base/               # Common base modules
+│   ├── BaseData/       # Common data layer
+│   ├── BaseDomain/     # Common domain layer
+│   └── BasePresentation/ # Common presentation layer
+├── Feature/            # Feature-specific modules
+│   ├── Features/       # TabBar management
+│   ├── Home/          # Home feature (Drivers & Races)
+│   ├── Onboarding/    # Onboarding feature
+│   └── Splash/        # Splash feature
+├── Infrastructure/     # Infrastructure layer
+│   └── NetworkInfra/  # Network management
+├── InjectionManager/   # DI container
+└── LibraryManager/     # External library management
 ```
 
-## 코딩 컨벤션
+## Feature Implementation
 
-### Swift 스타일 가이드
-- **네이밍**: 
-  - 클래스/구조체: PascalCase (예: `UserRepository`)
-  - 변수/함수: camelCase (예: `getUserData`)
-  - 상수: camelCase (예: `defaultTimeout`)
-  - 열거형: PascalCase, case는 camelCase
+### Home Module
+The Home module contains comprehensive race and driver functionality:
 
-### 파일 구조
-- 각 기능별로 Data, Domain, Presentation 레이어 분리
-- 각 레이어는 별도의 타겟으로 관리
-- Tuist를 통한 프로젝트 생성 및 관리
+#### Driver Features
+- **Driver List**: Complete driver standings and information
+- **Driver Detail**: Detailed driver statistics and information
+- **Driver Cards**: Compact driver representation with team colors and positions
 
-### 의존성 관리
-- DI Container를 통한 의존성 주입
-- 프로토콜 기반 인터페이스 정의
-- Mock 객체를 통한 테스트 지원
+#### Race Features
+- **Race Calendar**: Complete 2025 F1 season race list with filtering
+- **Race Detail**: Comprehensive race information with weekend schedule
+- **Race Cards**: Upcoming race preview with dates and locations
+- **Smart Filtering**: Automatic filtering to show upcoming races first
 
-### 네트워킹
-- NetworkInfra 모듈 사용
+#### UI Components
+- **F1-Inspired Design**: Official F1 app styling with red branding
+- **Gradient Backgrounds**: Dynamic color schemes matching F1 aesthetics
+- **Shadow Effects**: Premium card-based layout design
+- **Status Indicators**: Color-coded race status (upcoming/today/completed)
+
+## Coding Conventions
+
+### Swift Style Guide
+- **Naming Conventions**: 
+  - Classes/Structs: PascalCase (e.g., `UserRepository`)
+  - Variables/Functions: camelCase (e.g., `getUserData`)
+  - Constants: camelCase (e.g., `defaultTimeout`)
+  - Enums: PascalCase, cases are camelCase
+
+### File Structure
+- Separate Data, Domain, and Presentation layers for each feature
+- Each layer is managed as a separate target
+- Project generation and management through Tuist
+
+### UI Layout Conventions
+- **Individual addSubview calls**: Prefer explicit individual calls over forEach loops
+  ```swift
+  // ✅ Preferred
+  containerView.addSubview(titleLabel)
+  containerView.addSubview(subtitleLabel)
+  
+  // ❌ Avoid
+  [titleLabel, subtitleLabel].forEach { containerView.addSubview($0) }
+  ```
+- **F1 Design System**: Consistent use of F1 branding colors, fonts, and styling
+- **Localization**: Use English locale for date formatting (`en_US`)
+
+### Dependency Management
+- Dependency injection through DI Container
+- Protocol-based interface definitions
+- Mock objects for testing support
+
+### Networking
+- Use NetworkInfra module
 - Protocol-based networking (TargetType)
 - Error handling with NetworkError
-- Logger를 통한 로깅
+- Logging through Logger
 
-## 코드 리뷰 가이드라인
+## Data Flow Architecture
 
-### 체크 포인트
-1. **아키텍처 준수**: Clean Architecture 원칙 준수 여부
-2. **모듈 분리**: 적절한 레이어 분리 및 의존성 방향
-3. **네이밍 컨벤션**: Swift 네이밍 가이드라인 준수
-4. **테스트 코드**: 비즈니스 로직에 대한 테스트 작성
-5. **메모리 관리**: 순환 참조 방지 (weak, unowned 적절한 사용)
+### Race & Driver Data Flow
+```
+API Layer (NetworkInfra)
+    ↓
+Repository Layer (BaseData)
+    ↓
+UseCase Layer (BaseDomain)
+    ↓
+Reactor Layer (Presentation)
+    ↓
+ViewController/View Layer
+```
 
-### 금지 사항
-- 직접적인 UI 업데이트 (메인 스레드 외)
-- 하드코딩된 문자열 (Localizable.strings 사용)
-- 강한 참조로 인한 메모리 누수
-- 레이어 간 부적절한 의존성
+### Navigation Flow
+```
+Home → Race List → Race Detail
+Home → Driver List → Driver Detail
+```
 
-## 테스트 가이드라인
-- UseCase 레벨에서의 비즈니스 로직 테스트
-- Repository 패턴을 통한 데이터 레이어 테스트
-- Mock 객체를 활용한 단위 테스트
-- UI 테스트는 주요 플로우에 대해서만 작성
+## Code Review Guidelines
 
-## 라이브러리 사용 정책
-- SPM(Swift Package Manager)을 통한 의존성 관리
-- Tuist를 통한 라이브러리 모듈화
-- 최신 버전 유지 및 보안 취약점 점검
+### Checkpoint Items
+1. **Architecture Compliance**: Adherence to Clean Architecture principles
+2. **Module Separation**: Proper layer separation and dependency direction
+3. **Naming Conventions**: Compliance with Swift naming guidelines
+4. **Test Code**: Testing of business logic
+5. **Memory Management**: Prevention of retain cycles (proper use of weak, unowned)
+6. **UI Consistency**: F1 design system compliance
 
-## 성능 고려사항
-- 이미지 로딩 최적화
-- 네트워크 요청 캐싱
-- 메모리 사용량 모니터링
-- 배터리 효율성 고려
+### Prohibited Practices
+- Direct UI updates (outside main thread)
+- Hard-coded strings (use Localizable.strings)
+- Strong reference cycles causing memory leaks
+- Inappropriate dependencies between layers
+- forEach loops in addSubview operations
+
+## Testing Guidelines
+- Business logic testing at UseCase level
+- Data layer testing through Repository pattern
+- Unit testing with Mock objects
+- UI testing only for critical user flows
+
+## Library Usage Policy
+- Dependency management through SPM (Swift Package Manager)
+- Library modularization through Tuist
+- Maintain latest versions and security vulnerability checks
+
+## Performance Considerations
+- Image loading optimization
+- Network request caching
+- Memory usage monitoring
+- Battery efficiency considerations
+
+## Build Commands
+```bash
+# Generate project with Tuist
+tuist generate
+
+# Build for iOS Simulator
+xcodebuild -workspace F1Manager.xcworkspace -scheme F1Manager -destination 'platform=iOS Simulator,id=<DEVICE_ID>' build
+```

@@ -195,7 +195,6 @@ public final class DriverDetailViewController: UIViewController, View {
     
     public static func create(with reactor: DriverDetailReactor) -> DriverDetailViewController {
         let viewController = DriverDetailViewController()
-        viewController.hidesBottomBarWhenPushed = true
         viewController.reactor = reactor
         return viewController
     }

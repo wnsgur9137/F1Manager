@@ -15,6 +15,8 @@ public protocol HomeCoordinatorDependencies {
     func makeHomeViewController(flowAction: HomeFlowAction) -> HomeViewController
     func makeDriverListViewController(flowAction: DriverListFlowAction) -> DriverListViewController
     func makeDriverDetailViewController(driver: DriverModel, flowAction: DriverDetailFlowAction) -> DriverDetailViewController
+    func makeRaceListViewController(flowAction: RaceListFlowAction) -> RaceListViewController
+    func makeRaceDetailViewController(race: RaceModel, flowAction: RaceDetailFlowAction) -> RaceDetailViewController
 }
 
 public protocol HomeCoordinator: Coordinator {
@@ -45,7 +47,9 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
     public func showHomeViewController() {
         let flowAction = HomeFlowAction(
             navigateToDriverList: showDriverListViewController,
-            driverSelected: showDriverDetailViewController
+            driverSelected: showDriverDetailViewController,
+            navigateToRaceList: showRaceListViewController,
+            raceSelected: showRaceDetailViewController
         )
         let viewController = dependencies.makeHomeViewController(flowAction: flowAction)
         self.navigationController?.viewControllers = [viewController]
@@ -57,6 +61,7 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
             driverSelected: showDriverDetailViewController
         )
         let viewController = dependencies.makeDriverListViewController(flowAction: flowAction)
+        viewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     
@@ -65,6 +70,24 @@ public final class DefaultHomeCoordinator: HomeCoordinator {
             backButtonTapped: popViewController
         )
         let viewController = dependencies.makeDriverDetailViewController(driver: driver, flowAction: flowAction)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    private func showRaceListViewController() {
+        let flowAction = RaceListFlowAction(
+            backButtonTapped: popViewController,
+            raceSelected: showRaceDetailViewController
+        )
+        let viewController = dependencies.makeRaceListViewController(flowAction: flowAction)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    private func showRaceDetailViewController(race: RaceModel) {
+        let flowAction = RaceDetailFlowAction(backButtonTapped: popViewController)
+        let viewController = dependencies.makeRaceDetailViewController(race: race, flowAction: flowAction)
+        viewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(viewController, animated: true)
     }
     

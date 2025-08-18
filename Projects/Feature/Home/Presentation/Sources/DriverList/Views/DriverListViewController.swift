@@ -46,7 +46,6 @@ public final class DriverListViewController: UIViewController, View {
     
     public static func create(with reactor: DriverListReactor) -> DriverListViewController {
         let viewController = DriverListViewController()
-        viewController.hidesBottomBarWhenPushed = true
         viewController.reactor = reactor
         return viewController
     }

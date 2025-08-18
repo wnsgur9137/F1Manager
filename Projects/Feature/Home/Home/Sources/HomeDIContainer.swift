@@ -43,6 +43,17 @@ public final class HomeDIContainer: DIContainer {
         let useCase = DefaultDriverUseCase(repository: repository)
         return useCase
     }
+    
+    private func makeRaceRepository() -> RaceRepository {
+        let repository = DefaultRaceRepository(networkManager: dependencies.networkManager)
+        return repository
+    }
+    
+    private func makeRaceUseCase() -> RaceUseCase {
+        let repository = makeRaceRepository()
+        let useCase = DefaultRaceUseCase(repository: repository)
+        return useCase
+    }
 }
 
 extension HomeDIContainer: HomeCoordinatorDependencies {
@@ -51,9 +62,11 @@ extension HomeDIContainer: HomeCoordinatorDependencies {
     
     private func makeHomeReactor(flowAction: HomeFlowAction) -> HomeReactor {
         let driverUseCase = makeDriverUseCase()
+        let raceUseCase = makeRaceUseCase()
         let reactor = HomeReactor(
             flowAction: flowAction,
-            driverUseCase: driverUseCase
+            driverUseCase: driverUseCase,
+            raceUseCase: raceUseCase
         )
         return reactor
     }
@@ -104,6 +117,48 @@ extension HomeDIContainer: HomeCoordinatorDependencies {
             flowAction: flowAction
         )
         let viewController = DriverDetailViewController.create(with: reactor)
+        return viewController
+    }
+    
+    // MARK: - RaceList
+    
+    private func makeRaceListReactor(flowAction: RaceListFlowAction) -> RaceListReactor {
+        let raceUseCase = makeRaceUseCase()
+        let reactor = RaceListReactor(
+            flowAction: flowAction,
+            raceUseCase: raceUseCase
+        )
+        return reactor
+    }
+    
+    public func makeRaceListViewController(flowAction: RaceListFlowAction) -> RaceListViewController {
+        let reactor = makeRaceListReactor(flowAction: flowAction)
+        let viewController = RaceListViewController.create(with: reactor)
+        return viewController
+    }
+    
+    // MARK: - RaceDetail
+    
+    private func makeRaceDetailReactor(
+        race: RaceModel,
+        flowAction: RaceDetailFlowAction
+    ) -> RaceDetailReactor {
+        let reactor = RaceDetailReactor(
+            flowAction: flowAction,
+            race: race
+        )
+        return reactor
+    }
+    
+    public func makeRaceDetailViewController(
+        race: RaceModel,
+        flowAction: RaceDetailFlowAction
+    ) -> RaceDetailViewController {
+        let reactor = makeRaceDetailReactor(
+            race: race,
+            flowAction: flowAction
+        )
+        let viewController = RaceDetailViewController.create(with: reactor)
         return viewController
     }
     
