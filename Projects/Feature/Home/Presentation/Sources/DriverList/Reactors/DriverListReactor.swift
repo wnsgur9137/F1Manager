@@ -36,7 +36,7 @@ public final class DriverListReactor: Reactor {
     public enum Action {
         case viewDidLoad
         case backButtonTapped
-        case driverSelected(DriverModel)
+        case driverSelectedAt(IndexPath)
         case refreshDrivers
     }
     
@@ -47,7 +47,7 @@ public final class DriverListReactor: Reactor {
     }
     
     public struct State {
-        @Pulse var drivers: [DriverModel]?
+        @Pulse var driversDidUpdate: Void?
         @Pulse var isLoading: Bool?
         @Pulse var error: DriverListError?
     }
@@ -56,6 +56,8 @@ public final class DriverListReactor: Reactor {
     private let flowAction: DriverListFlowAction
     private let driverUseCase: DriverUseCase
     private let disposeBag = DisposeBag()
+    
+    private var drivers = [DriverModel]()
     
     public init(
         flowAction: DriverListFlowAction,
@@ -101,7 +103,8 @@ extension DriverListReactor {
             flowAction.backButtonTapped()
             return .empty()
             
-        case let .driverSelected(driver):
+        case let .driverSelectedAt(indexPath):
+            guard let driver = drivers[safe: indexPath.row] else { return .empty() }
             flowAction.driverSelected(driver)
             return .empty()
         }
@@ -114,12 +117,30 @@ extension DriverListReactor {
         var state = state
         switch mutation {
         case let .setDrivers(drivers):
-            state.drivers = drivers
+            self.drivers = drivers.sorted { (first, second) in
+                guard let firstPosition = first.standingPosition,
+                      let secondPosition = second.standingPosition else {
+                    return false
+                }
+                return firstPosition < secondPosition
+            }
+            state.driversDidUpdate = Void()
         case let .setLoading(isLoading):
             state.isLoading = isLoading
         case let .setError(error):
             state.error = handle(error)
         }
         return state
+    }
+}
+
+// MARK: - DriverListDataSource
+extension DriverListReactor: DriverListDataSource {
+    func numberOfRows(in section: Int) -> Int {
+        return drivers.count
+    }
+    
+    func cellForRow(at indexPath: IndexPath) -> DriverModel? {
+        return drivers[safe: indexPath.row]
     }
 }
