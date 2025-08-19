@@ -171,7 +171,7 @@ extension DriverListViewController {
 // MARK: - DriverListDelegate
 extension DriverListViewController: DriverListDelegate {
     func heightForRow(at indexPath: IndexPath) -> CGFloat {
-        return 100
+        return 100.0
     }
     
     func didSelectRow(at indexPath: IndexPath) {
