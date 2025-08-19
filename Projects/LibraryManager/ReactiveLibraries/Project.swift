@@ -16,6 +16,7 @@ let project: Project = .project(
         .SPM.Reactive.ReactorKit,
         .SPM.Reactive.RxSwift,
         .SPM.Reactive.RxCocoa,
+        .SPM.Reactive.RxDataSources,
         .SPM.Reactive.RxGesture
     ]
 )

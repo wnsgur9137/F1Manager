@@ -38,6 +38,7 @@ let package = Package(
         .package(url: "https://github.com/RxSwiftCommunity/RxGesture.git", from: "4.0.0"),
         .package(url: "https://github.com/RxSwiftCommunity/RxGesture", from: "4.0.0"),
         .package(url: "https://github.com/RxSwiftCommunity/RxNimble", branch: "master"),
+        .package(url: "https://github.com/RxSwiftCommunity/RxDataSources", from: "5.0.2"),
         .package(url: "https://github.com/ReactorKit/ReactorKit.git", branch: "master"),
         
         .package(url: "https://github.com/Alamofire/Alamofire", from: "5.0.0"),
