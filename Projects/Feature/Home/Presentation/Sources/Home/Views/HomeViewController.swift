@@ -11,6 +11,7 @@ import ReactorKit
 import RxSwift
 import RxCocoa
 import RxGesture
+import RxDataSources
 import SnapKit
 
 import BasePresentation
@@ -32,8 +33,6 @@ public final class HomeViewController: UIViewController, View {
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(DriverCollectionViewCell.self, forCellWithReuseIdentifier: DriverCollectionViewCell.identifier)
-        collectionView.delegate = self
-        collectionView.dataSource = self
         return collectionView
     }()
     
@@ -48,8 +47,6 @@ public final class HomeViewController: UIViewController, View {
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(RaceCollectionViewCell.self, forCellWithReuseIdentifier: RaceCollectionViewCell.identifier)
-        collectionView.delegate = self
-        collectionView.dataSource = self
         return collectionView
     }()
     
@@ -99,8 +96,21 @@ public final class HomeViewController: UIViewController, View {
     
     // MARK: - Properties
     
-    private var drivers: [DriverModel] = []
-    private var races: [RaceModel] = []
+    private let driversDataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, DriverModel>> { _, collectionView, indexPath, driver in
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DriverCollectionViewCell.identifier, for: indexPath) as? DriverCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(with: driver)
+        return cell
+    }
+    
+    private let racesDataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, RaceModel>> { _, collectionView, indexPath, race in
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RaceCollectionViewCell.identifier, for: indexPath) as? RaceCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(with: race)
+        return cell
+    }
     
     public var disposeBag = DisposeBag()
     
@@ -126,6 +136,7 @@ public final class HomeViewController: UIViewController, View {
         setupUI()
         setupNavigationBar()
         setupButtons()
+        setupCollectionViews()
         addSubviews()
         setupLayoutConstraints()
     }
@@ -141,6 +152,14 @@ public final class HomeViewController: UIViewController, View {
     private func setupButtons() {
         seeAllDriversButton.addTarget(self, action: #selector(seeAllDriversButtonTapped), for: .touchUpInside)
         seeAllRacesButton.addTarget(self, action: #selector(seeAllRacesButtonTapped), for: .touchUpInside)
+    }
+    
+    private func setupCollectionViews() {
+        driversCollectionView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
+        
+        racesCollectionView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
     }
     
     @objc private func seeAllDriversButtonTapped() {
@@ -170,7 +189,7 @@ extension HomeViewController {
         reactor.pulse(\.$drivers)
             .compactMap { $0 }
             .map { drivers in
-                return Array(drivers
+                let sortedDrivers = Array(drivers
                     .sorted { (first, second) in
                         guard let firstPosition = first.standingPosition,
                               let secondPosition = second.standingPosition else {
@@ -179,22 +198,18 @@ extension HomeViewController {
                         return firstPosition < secondPosition
                     }
                     .prefix(5))
+                return [SectionModel(model: "drivers", items: sortedDrivers)]
             }
-            .bind(onNext: { [weak self] drivers in
-                self?.drivers = drivers
-                self?.driversCollectionView.reloadData()
-            })
+            .bind(to: driversCollectionView.rx.items(dataSource: driversDataSource))
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$races)
             .compactMap { $0 }
             .map { races in
-                return Array(self.getUpcomingRaces(from: races).prefix(5))
+                let upcomingRaces = Array(self.getUpcomingRaces(from: races).prefix(5))
+                return [SectionModel(model: "races", items: upcomingRaces)]
             }
-            .bind(onNext: { [weak self] races in
-                self?.races = races
-                self?.racesCollectionView.reloadData()
-            })
+            .bind(to: racesCollectionView.rx.items(dataSource: racesDataSource))
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$error)
@@ -203,42 +218,23 @@ extension HomeViewController {
                 
             })
             .disposed(by: disposeBag)
+        
+        driversCollectionView.rx.itemSelected
+            .bind(onNext: { [weak self] indexPath in
+                guard let driver = self?.driversDataSource[indexPath] else { return }
+                self?.reactor?.action.onNext(.driverSelected(driver))
+            })
+            .disposed(by: disposeBag)
+        
+        racesCollectionView.rx.itemSelected
+            .bind(onNext: { [weak self] indexPath in
+                guard let race = self?.racesDataSource[indexPath] else { return }
+                self?.reactor?.action.onNext(.raceSelected(race))
+            })
+            .disposed(by: disposeBag)
     }
 }
 
-// MARK: - UICollectionViewDataSource
-extension HomeViewController: UICollectionViewDataSource {
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == driversCollectionView {
-            return drivers.count
-        } else if collectionView == racesCollectionView {
-            return races.count
-        }
-        return 0
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == driversCollectionView {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DriverCollectionViewCell.identifier, for: indexPath) as? DriverCollectionViewCell else {
-                return UICollectionViewCell()
-            }
-            
-            let driver = drivers[indexPath.item]
-            cell.configure(with: driver)
-            return cell
-        } else if collectionView == racesCollectionView {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RaceCollectionViewCell.identifier, for: indexPath) as? RaceCollectionViewCell else {
-                return UICollectionViewCell()
-            }
-            
-            let race = races[indexPath.item]
-            cell.configure(with: race)
-            return cell
-        }
-        
-        return UICollectionViewCell()
-    }
-}
 
 // MARK: - UICollectionViewDelegateFlowLayout
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
@@ -249,18 +245,6 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
             return CGSize(width: 180, height: 160)
         }
         return .zero
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == driversCollectionView {
-            guard indexPath.item < drivers.count else { return }
-            let selectedDriver = drivers[indexPath.item]
-            reactor?.action.onNext(.driverSelected(selectedDriver))
-        } else if collectionView == racesCollectionView {
-            guard indexPath.item < races.count else { return }
-            let selectedRace = races[indexPath.item]
-            reactor?.action.onNext(.raceSelected(selectedRace))
-        }
     }
 }
 
