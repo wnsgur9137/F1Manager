@@ -96,20 +96,12 @@ public final class HomeViewController: UIViewController, View {
     
     // MARK: - Properties
     
-    private let driversDataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, DriverModel>> { _, collectionView, indexPath, driver in
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DriverCollectionViewCell.identifier, for: indexPath) as? DriverCollectionViewCell else {
-            return UICollectionViewCell()
-        }
+    private lazy var driversDataSource = makeDataSource(cellIdentifier: DriverCollectionViewCell.identifier) { (cell: DriverCollectionViewCell, driver: DriverModel) in
         cell.configure(with: driver)
-        return cell
     }
     
-    private let racesDataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, RaceModel>> { _, collectionView, indexPath, race in
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RaceCollectionViewCell.identifier, for: indexPath) as? RaceCollectionViewCell else {
-            return UICollectionViewCell()
-        }
+    private lazy var racesDataSource = makeDataSource(cellIdentifier: RaceCollectionViewCell.identifier) { (cell: RaceCollectionViewCell, race: RaceModel) in
         cell.configure(with: race)
-        return cell
     }
     
     public var disposeBag = DisposeBag()
@@ -173,6 +165,20 @@ public final class HomeViewController: UIViewController, View {
     public func bind(reactor: HomeReactor) {
         bindAction(reactor)
         bindState(reactor)
+    }
+    
+    private func makeDataSource<Model, Cell: UICollectionViewCell>(
+        cellIdentifier: String,
+        configureCell: @escaping (Cell, Model) -> Void
+    ) -> RxCollectionViewSectionedReloadDataSource<SectionModel<String, Model>> {
+        return .init(configureCell: { _, collectionView, indexPath, item in
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? Cell else {
+                assertionFailure("셀을 dequeue하거나 타입 캐스팅하는 데 실패했습니다: \(cellIdentifier)")
+                return UICollectionViewCell()
+            }
+            configureCell(cell, item)
+            return cell
+        })
     }
 }
 
