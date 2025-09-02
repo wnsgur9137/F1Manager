@@ -225,18 +225,14 @@ extension HomeViewController {
             })
             .disposed(by: disposeBag)
         
-        driversCollectionView.rx.itemSelected
-            .bind(onNext: { [weak self] indexPath in
-                guard let driver = self?.driversDataSource[indexPath] else { return }
-                self?.reactor?.action.onNext(.driverSelected(driver))
-            })
+        driversCollectionView.rx.modelSelected(DriverModel.self)
+            .map(Reactor.Action.driverSelected)
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        racesCollectionView.rx.itemSelected
-            .bind(onNext: { [weak self] indexPath in
-                guard let race = self?.racesDataSource[indexPath] else { return }
-                self?.reactor?.action.onNext(.raceSelected(race))
-            })
+        racesCollectionView.rx.modelSelected(RaceModel.self)
+            .map(Reactor.Action.raceSelected)
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
 }
