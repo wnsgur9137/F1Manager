@@ -33,11 +33,33 @@ public final class DriverDetailViewController: UIViewController, View {
         return view
     }()
     
-    // Hero Section
+    // Hero Section with gradient background
     private let heroSectionView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
+    }()
+    
+    private let heroGradientLayer: CAGradientLayer = {
+        let gradient = CAGradientLayer()
+        gradient.colors = [
+            UIColor.systemRed.cgColor,
+            UIColor.systemRed.withAlphaComponent(0.8).cgColor,
+            UIColor.clear.cgColor
+        ]
+        gradient.locations = [0.0, 0.6, 1.0]
+        gradient.startPoint = CGPoint(x: 0, y: 0)
+        gradient.endPoint = CGPoint(x: 1, y: 1)
+        return gradient
+    }()
+    
+    private let heroBackgroundImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.alpha = 0.3
+        imageView.backgroundColor = .systemGray6
+        return imageView
     }()
     
     private let headshotImageView: UIImageView = {
@@ -55,14 +77,23 @@ public final class DriverDetailViewController: UIViewController, View {
         return view
     }()
     
+    private let driverNumberBadge: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.white.withAlphaComponent(0.9)
+        view.layer.cornerRadius = 25
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
+        view.layer.shadowRadius = 8
+        view.layer.shadowOpacity = 0.2
+        return view
+    }()
+    
     private let driverNumberLabel: UILabel = {
         let label = UILabel()
-        label.font = .f1(.bold, size: 72)
-        label.textColor = .white
+        label.font = .f1(.bold, size: 24)
+        label.textColor = .systemRed
         label.textAlignment = .center
         label.numberOfLines = 1
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
         return label
     }()
     
@@ -77,21 +108,33 @@ public final class DriverDetailViewController: UIViewController, View {
     private let firstNameLabel: UILabel = {
         let label = UILabel()
         label.font = .f1(.regular, size: 18)
-        label.textColor = .secondaryLabel
+        label.textColor = UIColor.white.withAlphaComponent(0.9)
+        label.layer.shadowColor = UIColor.black.cgColor
+        label.layer.shadowOffset = CGSize(width: 0, height: 1)
+        label.layer.shadowRadius = 2
+        label.layer.shadowOpacity = 0.5
         return label
     }()
     
     private let lastNameLabel: UILabel = {
         let label = UILabel()
         label.font = .f1(.bold, size: 32)
-        label.textColor = .label
+        label.textColor = .white
+        label.layer.shadowColor = UIColor.black.cgColor
+        label.layer.shadowOffset = CGSize(width: 0, height: 2)
+        label.layer.shadowRadius = 4
+        label.layer.shadowOpacity = 0.5
         return label
     }()
     
     private let teamNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .f1(.bold, size: 16)
-        label.textColor = .label
+        label.font = .f1(.bold, size: 18)
+        label.textColor = .white
+        label.layer.shadowColor = UIColor.black.cgColor
+        label.layer.shadowOffset = CGSize(width: 0, height: 1)
+        label.layer.shadowRadius = 2
+        label.layer.shadowOpacity = 0.5
         return label
     }()
     
@@ -103,14 +146,22 @@ public final class DriverDetailViewController: UIViewController, View {
     
     private let countryFlagLabel: UILabel = {
         let label = UILabel()
-        label.font = .f1(.regular, size: 24)
+        label.font = .f1(.regular, size: 28)
+        label.layer.shadowColor = UIColor.black.cgColor
+        label.layer.shadowOffset = CGSize(width: 0, height: 1)
+        label.layer.shadowRadius = 2
+        label.layer.shadowOpacity = 0.3
         return label
     }()
     
     private let countryNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .f1(.regular, size: 16)
-        label.textColor = .label
+        label.font = .f1(.bold, size: 16)
+        label.textColor = .white
+        label.layer.shadowColor = UIColor.black.cgColor
+        label.layer.shadowOffset = CGSize(width: 0, height: 1)
+        label.layer.shadowRadius = 2
+        label.layer.shadowOpacity = 0.5
         return label
     }()
     
@@ -141,15 +192,15 @@ public final class DriverDetailViewController: UIViewController, View {
         return card
     }()
     
-    // Championship Stats Section
-    private let statsSection: UIView = {
+    // Championship Stats Card Section
+    private let statsCardView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemBackground
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = 20
         view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 4)
+        view.layer.shadowRadius = 12
         view.layer.shadowOpacity = 0.1
-        view.layer.shadowOffset = CGSize(width: 0, height: 2)
-        view.layer.shadowRadius = 4
         return view
     }()
     
@@ -214,6 +265,12 @@ public final class DriverDetailViewController: UIViewController, View {
         setupNavigationBar()
         addSubviews()
         setupLayoutConstraints()
+        setupGradient()
+    }
+    
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        heroGradientLayer.frame = heroSectionView.bounds
     }
     
     private func setupUI() {
@@ -222,6 +279,11 @@ public final class DriverDetailViewController: UIViewController, View {
     
     private func setupNavigationBar() {
         navigationBar.setTitle("Driver Details")
+        navigationBar.backgroundColor = .clear
+    }
+    
+    private func setupGradient() {
+        heroSectionView.layer.insertSublayer(heroGradientLayer, at: 1)
     }
     
     public func bind(reactor: DriverDetailReactor) {
@@ -290,11 +352,21 @@ extension DriverDetailViewController {
         }
         countryNameLabel.text = driver.country
         
-        // Team Color
+        // Team Color for gradient
         if let teamColor = driver.teamColour,
            let color = UIColor(hex: teamColor) {
+            heroGradientLayer.colors = [
+                color.cgColor,
+                color.withAlphaComponent(0.8).cgColor,
+                UIColor.clear.cgColor
+            ]
             teamColorBannerView.backgroundColor = color
         } else {
+            heroGradientLayer.colors = [
+                UIColor.systemRed.cgColor,
+                UIColor.systemRed.withAlphaComponent(0.8).cgColor,
+                UIColor.clear.cgColor
+            ]
             teamColorBannerView.backgroundColor = .systemGray
         }
         
@@ -446,12 +518,15 @@ extension DriverDetailViewController {
         
         // Hero Section
         contentView.addSubview(heroSectionView)
+        heroSectionView.addSubview(heroBackgroundImageView)
         heroSectionView.addSubview(teamColorBannerView)
         heroSectionView.addSubview(headshotImageView)
-        heroSectionView.addSubview(driverNumberLabel)
+        heroSectionView.addSubview(driverNumberBadge)
         heroSectionView.addSubview(nameStackView)
         heroSectionView.addSubview(teamNameLabel)
         heroSectionView.addSubview(countryInfoView)
+        
+        driverNumberBadge.addSubview(driverNumberLabel)
         
         nameStackView.addArrangedSubview(firstNameLabel)
         nameStackView.addArrangedSubview(lastNameLabel)
@@ -460,9 +535,9 @@ extension DriverDetailViewController {
         countryInfoView.addSubview(countryNameLabel)
         
         // Stats Section
-        contentView.addSubview(statsSection)
-        statsSection.addSubview(statsSectionTitleLabel)
-        statsSection.addSubview(statsStackView)
+        contentView.addSubview(statsCardView)
+        statsCardView.addSubview(statsSectionTitleLabel)
+        statsCardView.addSubview(statsStackView)
         
         statsStackView.addArrangedSubview(positionStatView)
         statsStackView.addArrangedSubview(pointsStatView)
@@ -491,42 +566,52 @@ extension DriverDetailViewController {
             $0.width.equalToSuperview()
         }
         
-        // Hero Section
+        // Hero Section - 더 큰 크기로 변경
         heroSectionView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(320)
+            $0.top.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(300)
+        }
+        
+        heroBackgroundImageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
         teamColorBannerView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(16)
+            $0.edges.equalToSuperview()
         }
         
         headshotImageView.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(32)
+            $0.trailing.equalToSuperview().inset(24)
             $0.centerY.equalToSuperview()
             $0.width.height.equalTo(120)
         }
         
+        driverNumberBadge.snp.makeConstraints {
+            $0.top.trailing.equalToSuperview().inset(24)
+            $0.width.equalTo(80)
+            $0.height.equalTo(50)
+        }
+        
         driverNumberLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(24)
-            $0.trailing.equalTo(headshotImageView.snp.leading).offset(-16)
-            $0.width.equalTo(100)
+            $0.center.equalToSuperview()
         }
         
         nameStackView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(32)
-            $0.top.equalTo(driverNumberLabel.snp.bottom).offset(8)
-            $0.trailing.lessThanOrEqualTo(headshotImageView.snp.leading).offset(-16)
+            $0.top.equalToSuperview().inset(60)
+            $0.leading.equalToSuperview().inset(24)
+            $0.trailing.equalTo(driverNumberBadge.snp.leading).offset(-16)
         }
         
         teamNameLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(32)
-            $0.top.equalTo(nameStackView.snp.bottom).offset(8)
+            $0.top.equalTo(nameStackView.snp.bottom).offset(12)
+            $0.leading.trailing.equalToSuperview().inset(24)
         }
         
         countryInfoView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(32)
             $0.bottom.equalToSuperview().inset(24)
+            $0.leading.equalToSuperview().inset(24)
+            $0.trailing.lessThanOrEqualToSuperview().inset(24)
             $0.height.equalTo(30)
         }
         
@@ -540,11 +625,11 @@ extension DriverDetailViewController {
             $0.trailing.lessThanOrEqualToSuperview()
         }
         
-        // Stats Section
-        statsSection.snp.makeConstraints {
-            $0.top.equalTo(heroSectionView.snp.bottom).offset(24)
+        // Stats Card - 오버랩 효과
+        statsCardView.snp.makeConstraints {
+            $0.top.equalTo(heroSectionView.snp.bottom).offset(-30)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.equalTo(120)
+            $0.height.equalTo(140)
         }
         
         statsSectionTitleLabel.snp.makeConstraints {
@@ -558,7 +643,7 @@ extension DriverDetailViewController {
         
         // Info Cards
         infoCardsStackView.snp.makeConstraints {
-            $0.top.equalTo(statsSection.snp.bottom).offset(24)
+            $0.top.equalTo(statsCardView.snp.bottom).offset(24)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(24)
         }
