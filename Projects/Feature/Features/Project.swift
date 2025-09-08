@@ -15,6 +15,7 @@ let project: Project = .project(
     dependencies: [
         .Project.Feature.Splash,
         .Project.Feature.Onboarding,
-        .Project.Feature.Home
+        .Project.Feature.Home,
+        .Project.Feature.Settings
     ]
 )

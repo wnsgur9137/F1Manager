@@ -9,6 +9,7 @@
 import UIKit
 
 import Home
+import Settings
 import BasePresentation
 
 public protocol TabBarCoordinator: Coordinator {
@@ -25,20 +26,24 @@ public final class DefaultTabBarCoordinator: TabBarCoordinator {
     public weak var navigationController: UINavigationController?
     public weak var tabBarController: UITabBarController?
     private let homeDIContainer: HomeDIContainer
+    private let settingsDIContainer: SettingsDIContainer
     
     public init(
         rootNavigationController: UINavigationController,
         tabBarController: UITabBarController,
-        homeDIContainer: HomeDIContainer
+        homeDIContainer: HomeDIContainer,
+        settingsDIContainer: SettingsDIContainer
     ) {
         self.rootNavigationController = rootNavigationController
         self.tabBarController = tabBarController
         self.homeDIContainer = homeDIContainer
+        self.settingsDIContainer = settingsDIContainer
     }
     
     public func start() {
         let pages: [TabBarPage] = [
-            .home
+            .home,
+            .settings
         ]
         let controllers: [UINavigationController] = pages.map { getNavigationController($0) }
         prepareTabBarController(with: controllers)
@@ -66,6 +71,14 @@ public final class DefaultTabBarCoordinator: TabBarCoordinator {
             homeCoordinator.finishDelegate = self
             homeCoordinator.start()
             childCoordinators.append(homeCoordinator)
+        case .settings:
+            let settingsCoordinator = DefaultSettingsCoordinator(
+                navigationController: navigationController,
+                dependencies: settingsDIContainer
+            )
+            settingsCoordinator.finishDelegate = self
+            settingsCoordinator.start()
+            childCoordinators.append(settingsCoordinator)
         }
         
         return navigationController
