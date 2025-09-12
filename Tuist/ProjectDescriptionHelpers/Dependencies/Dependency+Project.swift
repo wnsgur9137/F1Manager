@@ -24,6 +24,7 @@ public enum ProjectDomain: String {
     case Splash
     case Onboarding
     case Home
+    case Settings
 }
 
 // MARK: - Projects
@@ -93,6 +94,11 @@ public extension TargetDependency.Project.Feature {
         domain: .Home,
         name: "Home"
     )
+    static let Settings: TargetDependency = .project(
+        layer: .Feature,
+        domain: .Settings,
+        name: "Settings"
+    )
 }
 
 // MARK: - Data
@@ -111,6 +117,11 @@ public extension TargetDependency.Project.Feature.Data {
         domain: .Home,
         layer: .Data,
         name: "HomeData"
+    )
+    static let SettingsData: TargetDependency = .project(
+        domain: .Settings,
+        layer: .Data,
+        name: "SettingsData"
     )
 }
 
@@ -131,6 +142,11 @@ public extension TargetDependency.Project.Feature.Domain {
         layer: .Domain,
         name: "HomeDomain"
     )
+    static let SettingsDomain: TargetDependency = .project(
+        domain: .Settings,
+        layer: .Domain,
+        name: "SettingsDomain"
+    )
 }
 
 // MARK: - Presentation
@@ -149,6 +165,11 @@ public extension TargetDependency.Project.Feature.Presentation {
         domain: .Home,
         layer: .Presentation,
         name: "HomePresentation"
+    )
+    static let SettingsPresentation: TargetDependency = .project(
+        domain: .Settings,
+        layer: .Presentation,
+        name: "SettingsPresentation"
     )
 }
 

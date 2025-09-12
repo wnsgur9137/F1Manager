@@ -10,10 +10,12 @@ import UIKit
 
 enum TabBarPage {
     case home
+    case settings
     
     init?(index: Int) {
         switch index {
         case 0: self = .home
+        case 1: self = .settings
         default: return nil
         }
     }
@@ -23,6 +25,7 @@ enum TabBarPage {
     func title() -> String {
         switch self {
         case .home: return "홈"
+        case .settings: return "설정"
         }
     }
     
@@ -31,6 +34,7 @@ enum TabBarPage {
     func orderNumber() -> Int {
         switch self {
         case .home: return 0
+        case .settings: return 1
         }
     }
     
@@ -39,6 +43,7 @@ enum TabBarPage {
     func image() -> UIImage? {
         switch self {
         case .home: return UIImage(systemName: "house")
+        case .settings: return UIImage(systemName: "gearshape")
         }
     }
     
@@ -47,6 +52,7 @@ enum TabBarPage {
     func selectedImage() -> UIImage? {
         switch self {
         case .home: return UIImage(systemName: "house.fill")
+        case .settings: return UIImage(systemName: "gearshape.fill")
         }
     }
 }

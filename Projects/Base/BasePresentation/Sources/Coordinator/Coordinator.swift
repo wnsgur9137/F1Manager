@@ -13,6 +13,7 @@ public enum CoordinatorType {
     case splash
     case onboarding
     case home
+    case settings
 }
 
 public protocol Coordinator: AnyObject {
