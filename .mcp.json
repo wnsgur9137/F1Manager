@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "code-reviewer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@vibesnipe/code-review-mcp"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "PROJECT_CONFIG": ".github/codereview-config.json"
+      }
+    },
+    "github-mcp": {
+      "command": "node",
+      "args": [
+        "${HOME}/.claude/mcpServers/github-mcp-server/dist/index.js"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "f1manager-linter": {
+      "command": "swift",
+      "args": [
+        "run",
+        "swiftlint"
+      ],
+      "env": {
+        "SWIFTLINT_CONFIG": ".swiftlint.yml"
+      }
+    }
+  }
+}
