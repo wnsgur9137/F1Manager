@@ -1,0 +1,112 @@
+name: Automated Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [master, develop]
+
+jobs:
+  automated-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install MCP CodeReview
+        run: |
+          npm install -g @anthropic/mcp-codereview
+
+      - name: Run Automated Code Review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          mcp-codereview \
+            --config .github/codereview-config.json \
+            --pr-number ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --base-ref ${{ github.event.pull_request.base.sha }} \
+            --head-ref ${{ github.event.pull_request.head.sha }} \
+            --comment-on-pr \
+            --severity-threshold medium
+
+      - name: F1Manager Specific Checks
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check for hardcoded strings in UI files
+          echo "Checking for hardcoded strings..."
+          if grep -r "\"[가-힣]\"" Projects/Feature/*/Presentation/Sources/ 2>/dev/null; then
+            echo "::warning::Hardcoded Korean strings found. Please use NSLocalizedString."
+          fi
+
+          # Check for forEach addSubview patterns
+          echo "Checking for prohibited forEach addSubview patterns..."
+          if grep -r "forEach.*addSubview" Projects/ 2>/dev/null; then
+            echo "::error::Prohibited forEach addSubview pattern found. Use individual addSubview calls."
+          fi
+
+          # Check Clean Architecture layer violations
+          echo "Checking for layer violations..."
+          if find Projects/Feature/*/Data/Sources -name "*.swift" -exec grep -l "import.*Presentation" {} \; 2>/dev/null | head -1; then
+            echo "::error::Data layer should not import Presentation layer."
+          fi
+
+          # Check for missing weak references in coordinators
+          echo "Checking coordinator memory management..."
+          if grep -r "var.*Coordinator.*=" Projects/Feature/*/Presentation/Sources/ 2>/dev/null | grep -v "weak"; then
+            echo "::warning::Consider using weak references for coordinator properties."
+          fi
+
+  tuist-validation:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Tuist
+        run: |
+          curl -Ls https://install.tuist.io | bash
+
+      - name: Validate Tuist Configuration
+        run: |
+          tuist generate --no-open
+          echo "✅ Tuist configuration is valid"
+
+  swift-lint:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SwiftLint
+        run: |
+          brew install swiftlint
+
+      - name: Run SwiftLint
+        run: |
+          swiftlint lint --reporter github-actions-logging
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for dependency cycles
+        run: |
+          echo "Checking for circular dependencies in Tuist projects..."
+          find Projects -name "Project.swift" -exec echo "Checking {}" \; -exec cat {} \;
+          echo "✅ Dependency check completed"

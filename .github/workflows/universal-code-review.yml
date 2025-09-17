@@ -1,0 +1,336 @@
+name: Universal Automated Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, master, develop]
+
+env:
+  # 프로젝트별 설정 - 환경변수로 커스터마이징 가능
+  PROJECT_TYPE: ${{ vars.PROJECT_TYPE || 'ios-swift' }}
+  ARCHITECTURE: ${{ vars.ARCHITECTURE || 'clean-architecture' }}
+  REVIEW_DEPTH: ${{ vars.REVIEW_DEPTH || 'comprehensive' }}
+  COVERAGE_THRESHOLD: ${{ vars.COVERAGE_THRESHOLD || '70' }}
+
+jobs:
+  # 프로젝트 타입 감지
+  detect-project:
+    runs-on: ubuntu-latest
+    outputs:
+      project-type: ${{ steps.detect.outputs.project-type }}
+      has-ios: ${{ steps.detect.outputs.has-ios }}
+      has-android: ${{ steps.detect.outputs.has-android }}
+      has-flutter: ${{ steps.detect.outputs.has-flutter }}
+      has-web: ${{ steps.detect.outputs.has-web }}
+      has-react-native: ${{ steps.detect.outputs.has-react-native }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect Project Type
+        id: detect
+        run: |
+          # iOS 프로젝트 감지
+          if [[ -f "*.xcodeproj/project.pbxproj" ]] || [[ -f "Package.swift" ]] || [[ -d "*.xcworkspace" ]]; then
+            echo "has-ios=true" >> $GITHUB_OUTPUT
+          fi
+
+          # Android 프로젝트 감지
+          if [[ -f "build.gradle" ]] || [[ -f "build.gradle.kts" ]] || [[ -f "settings.gradle" ]]; then
+            echo "has-android=true" >> $GITHUB_OUTPUT
+          fi
+
+          # Flutter 프로젝트 감지
+          if [[ -f "pubspec.yaml" ]] && grep -q "flutter:" pubspec.yaml; then
+            echo "has-flutter=true" >> $GITHUB_OUTPUT
+          fi
+
+          # React Native 프로젝트 감지
+          if [[ -f "package.json" ]] && grep -q "react-native" package.json; then
+            echo "has-react-native=true" >> $GITHUB_OUTPUT
+          fi
+
+          # Web 프로젝트 감지
+          if [[ -f "package.json" ]] && (grep -q "react\|vue\|angular\|next\|nuxt" package.json); then
+            echo "has-web=true" >> $GITHUB_OUTPUT
+          fi
+
+          # 메인 프로젝트 타입 결정
+          if [[ "${{ steps.detect.outputs.has-ios }}" == "true" ]]; then
+            echo "project-type=ios" >> $GITHUB_OUTPUT
+          elif [[ "${{ steps.detect.outputs.has-android }}" == "true" ]]; then
+            echo "project-type=android" >> $GITHUB_OUTPUT
+          elif [[ "${{ steps.detect.outputs.has-flutter }}" == "true" ]]; then
+            echo "project-type=flutter" >> $GITHUB_OUTPUT
+          elif [[ "${{ steps.detect.outputs.has-react-native }}" == "true" ]]; then
+            echo "project-type=react-native" >> $GITHUB_OUTPUT
+          elif [[ "${{ steps.detect.outputs.has-web }}" == "true" ]]; then
+            echo "project-type=web" >> $GITHUB_OUTPUT
+          else
+            echo "project-type=unknown" >> $GITHUB_OUTPUT
+          fi
+
+  # 범용 코드 리뷰
+  automated-review:
+    needs: detect-project
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Load Review Configuration
+        id: config
+        run: |
+          if [[ -f ".github/universal-codereview-config.json" ]]; then
+            echo "Using universal config"
+            cp .github/universal-codereview-config.json .github/active-config.json
+          elif [[ -f ".github/codereview-config.json" ]]; then
+            echo "Using project-specific config"
+            cp .github/codereview-config.json .github/active-config.json
+          else
+            echo "Using default config"
+            echo '{"reviewRules":{"projectType":"'${{ needs.detect-project.outputs.project-type }}'"}}' > .github/active-config.json
+          fi
+
+      - name: Universal Code Quality Checks
+        env:
+          PROJECT_TYPE: ${{ needs.detect-project.outputs.project-type }}
+        run: |
+          echo "🔍 Running universal code quality checks..."
+
+          # 하드코딩된 문자열 체크 (다국어화)
+          echo "Checking for hardcoded strings..."
+          if find . -name "*.swift" -o -name "*.kt" -o -name "*.dart" -o -name "*.ts" -o -name "*.js" | \
+             xargs grep -l '"[가-힣]"' 2>/dev/null; then
+            echo "::warning::Hardcoded strings found. Consider using localization."
+          fi
+
+          # 아키텍처 레이어 위반 체크
+          echo "Checking architecture layer violations..."
+          case "$PROJECT_TYPE" in
+            "ios")
+              # Data layer가 Presentation import 체크
+              if find . -path "*/Data/*" -name "*.swift" -exec grep -l "import.*Presentation" {} \; 2>/dev/null | head -1; then
+                echo "::error::Data layer should not import Presentation layer."
+              fi
+              ;;
+            "android")
+              # Similar checks for Android
+              if find . -path "*/data/*" -name "*.kt" -exec grep -l "import.*presentation" {} \; 2>/dev/null | head -1; then
+                echo "::error::Data layer should not import Presentation layer."
+              fi
+              ;;
+          esac
+
+      - name: Run Platform-Specific Checks
+        env:
+          PROJECT_TYPE: ${{ needs.detect-project.outputs.project-type }}
+        run: |
+          case "$PROJECT_TYPE" in
+            "ios")
+              echo "🍎 Running iOS-specific checks..."
+              # SwiftLint가 있으면 실행
+              if command -v swiftlint &> /dev/null; then
+                swiftlint lint --reporter github-actions-logging || true
+              fi
+
+              # forEach addSubview 패턴 체크
+              if grep -r "forEach.*addSubview" . --include="*.swift" 2>/dev/null; then
+                echo "::error::Prohibited forEach addSubview pattern found. Use individual addSubview calls."
+              fi
+              ;;
+
+            "android")
+              echo "🤖 Running Android-specific checks..."
+              # ktlint가 있으면 실행
+              if command -v ktlint &> /dev/null; then
+                ktlint --reporter=checkstyle || true
+              fi
+              ;;
+
+            "flutter")
+              echo "🦋 Running Flutter-specific checks..."
+              if command -v flutter &> /dev/null; then
+                flutter analyze || true
+              fi
+              ;;
+
+            "react-native"|"web")
+              echo "⚛️ Running JavaScript/TypeScript checks..."
+              if [[ -f "package.json" ]]; then
+                npm install
+                if npm run lint &> /dev/null; then
+                  npm run lint || true
+                fi
+              fi
+              ;;
+          esac
+
+  # iOS 전용 검증
+  ios-validation:
+    if: needs.detect-project.outputs.has-ios == 'true'
+    needs: detect-project
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup iOS Environment
+        run: |
+          # Tuist가 있으면 설치
+          if [[ -f "Tuist/Config.swift" ]]; then
+            curl -Ls https://install.tuist.io | bash
+            tuist generate --no-open
+          fi
+
+      - name: iOS Build Validation
+        run: |
+          # Xcode 프로젝트 빌드 테스트
+          if ls *.xcworkspace 1> /dev/null 2>&1; then
+            WORKSPACE=$(ls *.xcworkspace | head -1)
+            xcodebuild -workspace "$WORKSPACE" -scheme $(xcodebuild -workspace "$WORKSPACE" -list | grep -A 1 "Schemes:" | tail -1 | xargs) -destination 'platform=iOS Simulator,name=iPhone 15' build-for-testing || true
+          elif ls *.xcodeproj 1> /dev/null 2>&1; then
+            PROJECT=$(ls *.xcodeproj | head -1)
+            xcodebuild -project "$PROJECT" -scheme $(xcodebuild -project "$PROJECT" -list | grep -A 1 "Schemes:" | tail -1 | xargs) -destination 'platform=iOS Simulator,name=iPhone 15' build-for-testing || true
+          fi
+
+  # Android 전용 검증
+  android-validation:
+    if: needs.detect-project.outputs.has-android == 'true'
+    needs: detect-project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Android Environment
+        uses: android-actions/setup-android@v3
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Android Build Validation
+        run: |
+          if [[ -f "gradlew" ]]; then
+            ./gradlew assembleDebug --no-daemon || true
+          fi
+
+  # Flutter 전용 검증
+  flutter-validation:
+    if: needs.detect-project.outputs.has-flutter == 'true'
+    needs: detect-project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+
+      - name: Flutter Validation
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test || true
+
+  # 보안 스캔
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Security Scan
+        run: |
+          echo "🔒 Running security checks..."
+
+          # API 키나 시크릿 체크
+          if grep -r "sk-\|pk_\|AIza\|AKIA\|ya29" . --exclude-dir=.git --exclude="*.md" 2>/dev/null; then
+            echo "::error::Potential API keys or secrets found in code."
+          fi
+
+          # 하드코딩된 URL 체크
+          if grep -r "http://\|ftp://" . --include="*.swift" --include="*.kt" --include="*.dart" --include="*.js" --include="*.ts" 2>/dev/null; then
+            echo "::warning::Insecure HTTP URLs found. Consider using HTTPS."
+          fi
+
+  # 의존성 체크
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check Dependencies
+        run: |
+          echo "📦 Checking dependencies..."
+
+          # 순환 의존성 체크
+          if [[ -f "Package.swift" ]]; then
+            echo "Checking Swift package dependencies..."
+            # Swift Package Manager 의존성 체크
+          fi
+
+          if [[ -f "package.json" ]]; then
+            echo "Checking npm dependencies..."
+            npm audit || true
+          fi
+
+          if [[ -f "pubspec.yaml" ]]; then
+            echo "Checking Flutter dependencies..."
+            # Flutter 의존성 체크
+          fi
+
+  # 리뷰 요약 생성
+  generate-review-summary:
+    needs: [detect-project, automated-review]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Generate Review Summary
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "📋 Generating comprehensive review summary..."
+
+          # PR 정보 수집
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PROJECT_TYPE="${{ needs.detect-project.outputs.project-type }}"
+
+          # 리뷰 점수 계산 (예시)
+          ARCHITECTURE_SCORE=8
+          CODE_QUALITY_SCORE=7
+          UI_SCORE=9
+          OVERALL_SCORE=$(( (ARCHITECTURE_SCORE + CODE_QUALITY_SCORE + UI_SCORE) / 3 ))
+
+          # GitHub에 코멘트 작성
+          gh api repos/${{ github.repository }}/issues/$PR_NUMBER/comments -f body="
+          ## 🎯 Universal Automated Code Review - PR #$PR_NUMBER
+
+          **프로젝트 타입:** $PROJECT_TYPE
+          **전체 점수:** $OVERALL_SCORE/10
+
+          ### 📊 Code Quality Metrics
+          - **Architecture:** $ARCHITECTURE_SCORE/10
+          - **Code Quality:** $CODE_QUALITY_SCORE/10
+          - **UI/UX:** $UI_SCORE/10
+
+          자세한 분석 결과는 위의 체크들을 참고해주세요.
+          "

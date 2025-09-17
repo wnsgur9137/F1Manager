@@ -1,0 +1,46 @@
+{
+  "reviewRules": {
+    "projectName": "F1Manager",
+    "architecture": "clean-architecture",
+    "patterns": ["coordinator", "reactor-kit", "di-container"],
+    "swiftConventions": {
+      "naming": {
+        "classesStructs": "PascalCase",
+        "variablesFunctions": "camelCase",
+        "enumCases": "camelCase"
+      },
+      "prohibitedPatterns": [
+        "forEach.*addSubview",
+        "hardcoded_korean_strings"
+      ]
+    },
+    "cleanArchitecture": {
+      "enforceLayerSeparation": true,
+      "dataLayer": ["Repository", "DataSource", "DTO"],
+      "domainLayer": ["UseCase", "Entity", "Repository"],
+      "presentationLayer": ["ViewController", "Reactor", "View"],
+      "dependencyDirection": "data->domain<-presentation"
+    },
+    "f1DesignSystem": {
+      "brandingColors": true,
+      "consistentStyling": true,
+      "gradientEffects": true,
+      "cardLayout": true
+    },
+    "localization": {
+      "requireNSLocalizedString": true,
+      "noHardcodedStrings": true,
+      "locale": "en_US"
+    },
+    "memoryManagement": {
+      "weakDelegates": true,
+      "avoidRetainCycles": true,
+      "properDisposal": true
+    },
+    "testing": {
+      "businessLogicTests": true,
+      "mockUsage": true,
+      "coverageThreshold": 70
+    }
+  }
+}
